@@ -16,7 +16,6 @@
 # mqtt_basic:
 #   topic: "home-assistant/mqtt_example"
 # """
-from homeassistant.components import mqtt
 
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
@@ -25,14 +24,12 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+from .const import   (
+    DOMAIN,
+    MQTT_ROOT_TOPIC,
+    MQTT_ROOT_TOPIC_DEFAULT
+)
 
-# The domain of your component. Should be equal to the name of your component.
-DOMAIN = "openwbmqtt"
-
-MQTT_ROOT_TOPIC = 'mqttroot'
-MQTT_ROOT_TOPIC_DEFAULT = 'openWB'
-# CHARGE_POINTS = 'chargepoints'
-# DEFAULT_CHARGE_POINTS = [1]
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.Schema(
