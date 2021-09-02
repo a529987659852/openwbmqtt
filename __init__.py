@@ -85,7 +85,7 @@ def setup(hass, config):
         if call.data.get('charge_limitation') == "Not limited":
             payload = str(0)
             hass.components.mqtt.publish(topic, payload)
-        elif call.data.get('charge_Limitation') == "kWh":
+        elif call.data.get('charge_limitation') == "kWh":
             payload = str(1)
             topic2 = f"{mqttprefix}/config/set/sofort/lp/{call.data.get('charge_point_id')}/energyToCharge"
             payload2 = str(call.data.get('energy_to_charge'))
