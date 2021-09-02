@@ -1,0 +1,10 @@
+{
+  "domain": "openwbmqtt",
+  "name": "openWB over MQTT",
+  "documentation": "https://github.com/a529987659852/openWB-mqtt",
+  "dependencies": ["mqtt"],
+  "codeowners": [],
+  "requirements": [],
+  "iot_class": "local_polling",
+  "version": "0.1.0"
+}

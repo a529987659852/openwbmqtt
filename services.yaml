@@ -1,0 +1,111 @@
+enable_disable_cp:
+  description: Enable or disable a charge point
+  fields:
+    selected_status:
+      name: Charge point status
+      description: Desired status of the charge point
+      default: "On"
+      example: "On"
+      required: true
+      selector:
+        select:
+          options:
+            - 'On'
+            - 'Off'
+    charge_point_id:
+      name: Charge point ID
+      description: ID of the charge point which shall be enabled / disabled
+      default: 1
+      example: 1
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 8
+change_global_charge_mode:
+  description: Change the global charge mode of the wallbox
+  fields:
+    global_charge_mode:
+      name: Global charge mode
+      description: Desired global charge mode
+      example: "Sofortladen"
+      default: "Sofortladen"
+      required: true
+      selector:
+        select:
+          options:
+            - "Sofortladen"
+            - "Min+PV-Laden"
+            - "Nur PV-Laden"
+            - "Stop"
+            - "Standby"
+
+change_charge_limitation_per_cp:
+  description: 
+  fields:
+    charge_limitation:
+      name: Charge mode
+      description: 
+      default: 
+      example: 
+      required: true
+      selector:
+        select:
+          options:
+            - 'Not limited'
+            - 'kWh'
+            - 'SOC'
+    charge_point_id:
+      name: Charge point ID
+      description: ID of the charge point which shall be enabled / disabled
+      default: 1
+      example: 1
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 8
+    energy_to_charge:
+      name: kWh
+      description:
+      default: 30
+      example: 30
+      selector:
+        number:
+          min: 10
+          max: 50
+          step: 10         
+    required_soc:
+      name: SOC
+      description:
+      default: 30
+      example: 30
+      selector:
+        number:
+          min: 10
+          max: 100
+          step: 10
+
+change_charge_current_per_cp:
+  description: 
+  fields:
+    charge_point_id:
+      name: Charge point ID
+      description: ID of the charge point which shall be enabled / disabled
+      default: 1
+      example: 1
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 8
+    target_current:
+      name: A
+      description:
+      default: 6
+      example: 6
+      selector:
+        number:
+          min: 6
+          max: 16
+          step: 1  
