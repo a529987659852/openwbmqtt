@@ -1,19 +1,16 @@
-"""Support for DSMR Reader through MQTT."""
+"""Support for openWB sensors through MQTT."""
 from __future__ import annotations
 
-from homeassistant.components import mqtt
-from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import callback
 from homeassistant.util import slugify
-import voluptuous as vol
-
+from homeassistant.components import mqtt
 from homeassistant.components.sensor import (
+    SensorEntity,
     PLATFORM_SCHEMA,
 )
+import voluptuous as vol
 
-#from .definitions import SENSORS, DSMRReaderSensorEntityDescription
-
-# Configuration
+# Import global parameters
 from .const import (
     MQTT_ROOT_TOPIC,
     MQTT_ROOT_TOPIC_DEFAULT,
@@ -21,7 +18,7 @@ from .const import (
     DEFAULT_CHARGE_POINTS,
     SENSORS_GLOBAL,
     SENSORS_PER_LP,
-    DSMRReaderSensorEntityDescription,
+    openwbSensorEntityDescription,
 )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
@@ -36,27 +33,29 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 )
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up DSMR Reader sensors."""
-    s = []
+    """Set up sensors for openWB."""
+    sensorList = []
+    # Global sensors
     for description in SENSORS_GLOBAL:
-        description.key = config[MQTT_ROOT_TOPIC] + '/' + description.key
-        s.append(DSMRSensor(description=description))
-    for chargePoint in config[CHARGE_POINTS]:
-        for description in SENSORS_PER_LP:
-            description.key = config[MQTT_ROOT_TOPIC] + '/lp/' + str(chargePoint) + '/' + description.key
-            s.append(DSMRSensor(description=description))
+        description.key = config.get(MQTT_ROOT_TOPIC) + '/' + description.key
+        sensorList.append(openwbSensor(description=description))
     
-    async_add_entities(s)
+    # Sensors applying to each charge point
+    for chargePoint in config.get(CHARGE_POINTS):
+        for description in SENSORS_PER_LP:
+            description.key = config.get(MQTT_ROOT_TOPIC) + '/lp/' + str(chargePoint) + '/' + description.key
+            sensorList.append(openwbSensor(description=description))
+    
+    async_add_entities(sensorList)
 
-class DSMRSensor(SensorEntity):
-    """Representation of a DSMR sensor that is updated via MQTT."""
+class openwbSensor(SensorEntity):
+    """Representation of an openWB that is updated via MQTT."""
 
-    entity_description: DSMRReaderSensorEntityDescription
+    entity_description: openwbSensorEntityDescription
 
-    def __init__(self, description: DSMRReaderSensorEntityDescription) -> None:
+    def __init__(self, description: openwbSensorEntityDescription) -> None:
         """Initialize the sensor."""
         self.entity_description = description
-
         slug = slugify(description.key.replace("/", "_"))
         self.entity_id = f"sensor.{slug}"
 
@@ -71,11 +70,14 @@ class DSMRSensor(SensorEntity):
             else:
                 self._attr_native_value = message.payload
 
+            #Map values as defined in the value map dict
             if self.entity_description.valueMap is not None:
                 try:
                     self._attr_native_value = self.entity_description.valueMap.get(int(self._attr_native_value))
                 except ValueError:
                     self._attr_native_value = self._attr_native_value
+            
+            #Reformat TimeRemaining --> hh:mm
             if 'TimeRemaining' in self.entity_description.key:
                 if 'H' in self._attr_native_value:
                     tmp = self._attr_native_value.split() 
@@ -83,6 +85,8 @@ class DSMRSensor(SensorEntity):
                 elif 'Min' in self._attr_native_value:
                     tmp = self._attr_native_value.split() 
                     self._attr_native_value = f"00:{int(tmp[0]):02d}"
+            
+            #Update entity state with value published on MQTT
             self.async_write_ha_state()
 
         await mqtt.async_subscribe(

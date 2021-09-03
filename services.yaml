@@ -4,8 +4,7 @@ enable_disable_cp:
     selected_status:
       name: Charge point status
       description: Desired status of the charge point
-      default: "On"
-      example: "On"
+      default: 'On'
       required: true
       selector:
         select:
@@ -16,7 +15,6 @@ enable_disable_cp:
       name: Charge point ID
       description: ID of the charge point which shall be enabled / disabled
       default: 1
-      example: 1
       required: true
       selector:
         number:
@@ -28,7 +26,6 @@ change_global_charge_mode:
     global_charge_mode:
       name: Global charge mode
       description: Desired global charge mode
-      example: "Sofortladen"
       default: "Sofortladen"
       required: true
       selector:
@@ -45,9 +42,8 @@ change_charge_limitation_per_cp:
   fields:
     charge_limitation:
       name: Charge mode
-      description: 
-      default: 
-      example: 
+      description: Defines the submode for each charge point in global mode Sofortladen
+      default: 'Not limited'
       required: true
       selector:
         select:
@@ -66,8 +62,8 @@ change_charge_limitation_per_cp:
           min: 1
           max: 8
     energy_to_charge:
-      name: kWh
-      description:
+      name: Energy to charge in kWHs
+      description: Defines the amount of energy to charge in mode Sofortladen
       default: 30
       example: 30
       selector:
@@ -76,8 +72,8 @@ change_charge_limitation_per_cp:
           max: 50
           step: 10         
     required_soc:
-      name: SOC
-      description:
+      name: Charge upto this SOC
+      description: Defines the max SOC to which the vehicle shall be charged in mode Sofortladen
       default: 30
       example: 30
       selector:
@@ -100,8 +96,8 @@ change_charge_current_per_cp:
           min: 1
           max: 8
     target_current:
-      name: A
-      description:
+      name: Charging current in A
+      description: Defines the charging current in A
       default: 6
       example: 6
       selector:
