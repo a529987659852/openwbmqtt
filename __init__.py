@@ -1,34 +1,37 @@
 """The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
 
-import voluptuous as vol
-import homeassistant.helpers.config_validation as cv
 import logging
 
-from .const import   (
-    DOMAIN,
-    MQTT_ROOT_TOPIC,
-    MQTT_ROOT_TOPIC_DEFAULT
-)
+import voluptuous as vol
+
+import homeassistant.helpers.config_validation as cv
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+
+from .const import CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC
 
 _LOGGER = logging.getLogger(__name__)
+PLATFORMS = ["sensor"]
 
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(MQTT_ROOT_TOPIC,default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
-            }
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+
+    # Provide data obtained in the configuration flow so that it can be used when setting up the entries 
+    hass.data.setdefault(DOMAIN, {MQTT_ROOT_TOPIC: {}})
+    hass.data[DOMAIN][MQTT_ROOT_TOPIC] = entry.data[MQTT_ROOT_TOPIC]
+    hass.data.setdefault(DOMAIN, {CHARGE_POINTS: {}})
+    hass.data[DOMAIN][CHARGE_POINTS] = entry.data[CHARGE_POINTS]
+
+    # Trigger the creation of sensors
+    for platform in PLATFORMS:
+        hass.async_create_task(
+            hass.config_entries.async_forward_entry_setup(entry, platform)
         )
-    },
-    extra=vol.ALLOW_EXTRA,
-)
-
-def setup(hass, config):
+        
     """Define services that publish data to MQTT. The published data is subscribed by openWB
     and the respective settings are changed."""
 
     #Prefix: If the openWB mqtt server is briged to a central mqtt server, a prefix is required.
-    mqttprefix = config[DOMAIN][MQTT_ROOT_TOPIC]
+    mqttprefix = entry.data[MQTT_ROOT_TOPIC]
     _LOGGER.debug("mqttprefix: %s", mqttprefix)
     
     #Define functions to execute on service call
@@ -94,10 +97,10 @@ def setup(hass, config):
         hass.components.mqtt.publish(topic, payload)
 
     # Register our services with Home Assistant.
-    hass.services.register(DOMAIN, 'enable_disable_cp', fun_enable_disable_cp)
-    hass.services.register(DOMAIN, 'change_global_charge_mode', fun_change_global_charge_mode)
-    hass.services.register(DOMAIN, 'change_charge_limitation_per_cp', fun_change_charge_limitation_per_cp)
-    hass.services.register(DOMAIN, 'change_charge_current_per_cp', fun_change_charge_current_per_cp)
-
+    hass.services.async_register(DOMAIN, 'enable_disable_cp', fun_enable_disable_cp)
+    hass.services.async_register(DOMAIN, 'change_global_charge_mode', fun_change_global_charge_mode)
+    hass.services.async_register(DOMAIN, 'change_charge_limitation_per_cp', fun_change_charge_limitation_per_cp)
+    hass.services.async_register(DOMAIN, 'change_charge_current_per_cp', fun_change_charge_current_per_cp)
+    
     # Return boolean to indicate that initialization was successfully.
     return True

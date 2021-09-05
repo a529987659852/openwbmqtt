@@ -1,27 +1,21 @@
 # The domain of your component. Should be equal to the name of your component.
 from __future__ import annotations
 
-from homeassistant.components.sensor import (
-    STATE_CLASS_MEASUREMENT,
-    STATE_CLASS_TOTAL_INCREASING,
-    SensorEntityDescription,
-)
-from homeassistant.const import (
-    DEVICE_CLASS_BATTERY,
-    DEVICE_CLASS_CURRENT,
-    DEVICE_CLASS_ENERGY,
-    DEVICE_CLASS_POWER,
-    DEVICE_CLASS_VOLTAGE,
-    ELECTRIC_CURRENT_AMPERE,
-    ELECTRIC_POTENTIAL_VOLT,
-    ENERGY_KILO_WATT_HOUR,
-    LENGTH_KILOMETERS,
-    PERCENTAGE,
-    POWER_WATT,
-)
-
 from dataclasses import dataclass
 from typing import Callable
+
+import voluptuous as vol
+
+import homeassistant.helpers.config_validation as cv
+from homeassistant.components.sensor import (STATE_CLASS_MEASUREMENT,
+                                             STATE_CLASS_TOTAL_INCREASING,
+                                             SensorEntityDescription)
+from homeassistant.const import (DEVICE_CLASS_BATTERY, DEVICE_CLASS_CURRENT,
+                                 DEVICE_CLASS_ENERGY, DEVICE_CLASS_POWER,
+                                 DEVICE_CLASS_VOLTAGE, ELECTRIC_CURRENT_AMPERE,
+                                 ELECTRIC_POTENTIAL_VOLT,
+                                 ENERGY_KILO_WATT_HOUR, LENGTH_KILOMETERS,
+                                 PERCENTAGE, POWER_WATT)
 
 # Global parameters
 DOMAIN = "openwbmqtt"
@@ -29,7 +23,14 @@ DOMAIN = "openwbmqtt"
 MQTT_ROOT_TOPIC = 'mqttroot'
 MQTT_ROOT_TOPIC_DEFAULT = 'openWB'
 CHARGE_POINTS = 'chargepoints'
-DEFAULT_CHARGE_POINTS = [1]
+DEFAULT_CHARGE_POINTS = 1
+
+DATA_SCHEMA = vol.Schema(
+    {
+        vol.Required(MQTT_ROOT_TOPIC, default = MQTT_ROOT_TOPIC_DEFAULT): cv.string,
+        vol.Required(CHARGE_POINTS, default = DEFAULT_CHARGE_POINTS ): cv.positive_int,
+    }
+)
 
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
