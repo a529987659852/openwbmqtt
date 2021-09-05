@@ -1,49 +1,42 @@
 """Support for openWB sensors through MQTT."""
 from __future__ import annotations
 
-from homeassistant.core import callback
-from homeassistant.util import slugify
-from homeassistant.components import mqtt
-from homeassistant.components.sensor import (
-    SensorEntity,
-    PLATFORM_SCHEMA,
-)
+import copy
+import logging
+
 import voluptuous as vol
 
+from homeassistant.components import mqtt
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
+from homeassistant.core import callback
+from homeassistant.util import slugify
+
 # Import global parameters
-from .const import (
-    MQTT_ROOT_TOPIC,
-    MQTT_ROOT_TOPIC_DEFAULT,
-    CHARGE_POINTS,
-    DEFAULT_CHARGE_POINTS,
-    SENSORS_GLOBAL,
-    SENSORS_PER_LP,
-    openwbSensorEntityDescription,
-)
+from .const import (CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC, SENSORS_GLOBAL,
+                    SENSORS_PER_LP, openwbSensorEntityDescription)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Optional(
-            MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT
-        ): mqtt.valid_subscribe_topic,
-        vol.Optional(
-            CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS
-        ): list
-    }
-)
+_LOGGER = logging.getLogger(__name__)
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_entry(hass, config, async_add_entities):
+
+    """Reuse data obtained in the configuration flow so that it can be used when setting up the entries.
+    Data flow is config_flow.py --> data --> init.py --> hass.data --> sensor.py --> hass.data """
+    CONFIG_DATA = hass.data[DOMAIN]
+
     """Set up sensors for openWB."""
     sensorList = []
     # Global sensors
     for description in SENSORS_GLOBAL:
-        description.key = config.get(MQTT_ROOT_TOPIC) + '/' + description.key
+        description.key = CONFIG_DATA[MQTT_ROOT_TOPIC] + '/' + description.key
+        _LOGGER.debug("MQTT topic: %s", description.key)
         sensorList.append(openwbSensor(description=description))
     
     # Sensors applying to each charge point
-    for chargePoint in config.get(CHARGE_POINTS):
-        for description in SENSORS_PER_LP:
-            description.key = config.get(MQTT_ROOT_TOPIC) + '/lp/' + str(chargePoint) + '/' + description.key
+    for chargePoint in range(1, int(CONFIG_DATA[CHARGE_POINTS]) + 1):
+        local_sensors_per_lp = copy.deepcopy(SENSORS_PER_LP)
+        for description in local_sensors_per_lp:
+            description.key = CONFIG_DATA[MQTT_ROOT_TOPIC] + '/lp/' + str(chargePoint) + '/' + description.key
+            _LOGGER.debug("MQTT topic: %s", description.key)
             sensorList.append(openwbSensor(description=description))
     
     async_add_entities(sensorList)
