@@ -22,6 +22,10 @@ class openwbmqttConfigFlow(ConfigFlow, domain=DOMAIN):
         title = f"{DOMAIN}-{user_input[MQTT_ROOT_TOPIC]}"
         title = title.replace("/","_")
         title = slugify(title)
+        
+        # abort if the same integration was already configured
+        await self.async_set_unique_id(title)
+        self._abort_if_unique_id_configured()
 
         return self.async_create_entry(
             title= title,
