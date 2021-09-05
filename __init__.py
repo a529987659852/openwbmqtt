@@ -104,3 +104,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Return boolean to indicate that initialization was successfully.
     return True
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload all sensor entities and services if integration is removed via UI.
+    No restart of home assistant is required."""
+    hass.services.async_remove(DOMAIN, 'enable_disable_cp') 
+    hass.services.async_remove(DOMAIN, 'change_global_charge_mode') 
+    hass.services.async_remove(DOMAIN, 'change_charge_limitation_per_cp')
+    hass.services.async_remove(DOMAIN, 'change_charge_current_per_cp')
+    unload_ok =  await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok:
+        del hass.data[DOMAIN]
+
+    return unload_ok
