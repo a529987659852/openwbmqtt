@@ -21,7 +21,7 @@ from homeassistant.const import (DEVICE_CLASS_BATTERY, DEVICE_CLASS_CURRENT,
 DOMAIN = "openwbmqtt"
 
 MQTT_ROOT_TOPIC = 'mqttroot'
-MQTT_ROOT_TOPIC_DEFAULT = 'openWB'
+MQTT_ROOT_TOPIC_DEFAULT = 'openWB/openWB'
 CHARGE_POINTS = 'chargepoints'
 DEFAULT_CHARGE_POINTS = 1
 
