@@ -1,9 +1,9 @@
 # openWBmqtt
 Custom component for home assistant supporting openWB wallbox
 
-## Example Configuration.yaml --
+## How to add this custom componant to home assistant
 
-In order to add this custom component to home assistant, choose Settings -> Integrations -> add the Integration
+Clone the custom component to your custom components folder. Then, in HA, choose Settings -> Integrations -> add the Integration
 
 The first parameter, mqttroot, defines the prefix that shall be applied to all MQTT topics.
 
