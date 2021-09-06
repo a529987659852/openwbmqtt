@@ -16,11 +16,11 @@ PLATFORMS = ["sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
-    # Provide data obtained in the configuration flow so that it can be used when setting up the entries
-    hass.data.setdefault(DOMAIN, {MQTT_ROOT_TOPIC: {}})
-    hass.data[DOMAIN][MQTT_ROOT_TOPIC] = entry.data[MQTT_ROOT_TOPIC]
-    hass.data.setdefault(DOMAIN, {CHARGE_POINTS: {}})
-    hass.data[DOMAIN][CHARGE_POINTS] = entry.data[CHARGE_POINTS]
+    # # Provide data obtained in the configuration flow so that it can be used when setting up the entries
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        MQTT_ROOT_TOPIC: entry.data[MQTT_ROOT_TOPIC],
+        CHARGE_POINTS: entry.data[CHARGE_POINTS],
+    }
 
     # Trigger the creation of sensors
     for platform in PLATFORMS:
@@ -31,16 +31,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Define services that publish data to MQTT. The published data is subscribed by openWB
     and the respective settings are changed."""
 
-    # Prefix: If the openWB mqtt server is briged to a central mqtt server, a prefix is required.
-    mqttprefix = entry.data[MQTT_ROOT_TOPIC]
-    _LOGGER.debug("mqttprefix: %s", mqttprefix)
+    # # Prefix: If the openWB mqtt server is briged to a central mqtt server, a prefix is required.
+    # call.data.get('mqtt_prefix') = entry.data[MQTT_ROOT_TOPIC]
+    # _LOGGER.debug("call.data.get('mqtt_prefix'): %s", call.data.get('mqtt_prefix'))
 
     # Define functions to execute on service call
     def fun_enable_disable_cp(call):
         """Enable or disable charge point # --> set/lp#/ChargePointEnabled [0,1]"""
-        topic = (
-            f"{mqttprefix}/set/lp{call.data.get('charge_point_id')}/ChargePointEnabled"
-        )
+        topic = f"{call.data.get('mqtt_prefix')}/set/lp{call.data.get('charge_point_id')}/ChargePointEnabled"
         _LOGGER.debug("topic (enable_disable_cp): %s", topic)
 
         if call.data.get("selected_status") == "On":
@@ -50,7 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     def fun_change_global_charge_mode(call):
         """Change the wallbox global charge mode --> set/ChargeMode [0, .., 3]"""
-        topic = f"{mqttprefix}/set/ChargeMode"
+        topic = f"{call.data.get('mqtt_prefix')}/set/ChargeMode"
         _LOGGER.debug("topic (change_global_charge_mode): %s", topic)
 
         if call.data.get("global_charge_mode") == "Sofortladen":
@@ -72,7 +70,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         --> config/set/sofort/lp/#/energyToCharge [value in kWh]
         --> config/set/sofort/lp/#/socToChargeTo [value in %]
         """
-        topic = f"{mqttprefix}/config/set/sofort/lp/{call.data.get('charge_point_id')}/chargeLimitation"
+        topic = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/chargeLimitation"
         _LOGGER.debug("topic (change_charge_limitation_per_cp): %s", topic)
 
         if call.data.get("charge_limitation") == "Not limited":
@@ -80,20 +78,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.components.mqtt.publish(topic, payload)
         elif call.data.get("charge_limitation") == "kWh":
             payload = str(1)
-            topic2 = f"{mqttprefix}/config/set/sofort/lp/{call.data.get('charge_point_id')}/energyToCharge"
+            topic2 = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/energyToCharge"
             payload2 = str(call.data.get("energy_to_charge"))
             hass.components.mqtt.publish(topic, payload)
             hass.components.mqtt.publish(topic2, payload2)
         elif call.data.get("charge_limitation") == "SOC":
             payload = str(2)
-            topic2 = f"{mqttprefix}/config/set/sofort/lp/{call.data.get('charge_point_id')}/socToChargeTo"
+            topic2 = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/socToChargeTo"
             payload2 = str(call.data.get("required_soc"))
             hass.components.mqtt.publish(topic, payload)
             hass.components.mqtt.publish(topic2, payload2)
 
     def fun_change_charge_current_per_cp(call):
         """Set the charge current per loading point --> config/set/sofort/lp/#/current [value in A]"""
-        topic = f"{mqttprefix}/config/set/sofort/lp/{call.data.get('charge_point_id')}/current"
+        topic = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/current"
         _LOGGER.debug("topic (fun_change_charge_current_per_cp): %s", topic)
 
         payload = str(call.data.get("target_current"))
@@ -123,7 +121,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_remove(DOMAIN, "change_charge_limitation_per_cp")
     hass.services.async_remove(DOMAIN, "change_charge_current_per_cp")
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        del hass.data[DOMAIN]
 
     return unload_ok

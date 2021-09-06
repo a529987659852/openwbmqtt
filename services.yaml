@@ -1,6 +1,14 @@
 enable_disable_cp:
   description: Enable or disable a charge point
   fields:
+    mqtt_prefix:
+      name: Prefix for MQTT topic
+      description: Prefix on the MQTT server that addresses the respective wallbox
+      default: 'openWB/openWB'
+      example: 'openWB/openWB'
+      required: true
+      selector:
+        text:
     selected_status:
       name: Charge point status
       description: Desired status of the charge point
@@ -23,6 +31,14 @@ enable_disable_cp:
 change_global_charge_mode:
   description: Change the global charge mode of the wallbox
   fields:
+    mqtt_prefix:
+      name: Prefix for MQTT topic
+      description: respective Prefix on the MQTT server that addresses the respective wallbox
+      default: 'openWB/openWB'
+      example: 'openWB/openWB'
+      required: true    
+      selector:
+        text:
     global_charge_mode:
       name: Global charge mode
       description: Desired global charge mode
@@ -40,6 +56,14 @@ change_global_charge_mode:
 change_charge_limitation_per_cp:
   description: 
   fields:
+    mqtt_prefix:
+      name: Prefix for MQTT topic
+      description: respective Prefix on the MQTT server that addresses the respective wallbox
+      default: 'openWB/openWB'
+      example: 'openWB/openWB'
+      required: true
+      selector:
+        text:
     charge_limitation:
       name: Charge mode
       description: Defines the submode for each charge point in global mode Sofortladen
@@ -62,7 +86,7 @@ change_charge_limitation_per_cp:
           min: 1
           max: 8
     energy_to_charge:
-      name: Energy to charge in kWHs
+      name: Energy to charge in kWhs
       description: Defines the amount of energy to charge in mode Sofortladen
       default: 30
       example: 30
@@ -85,6 +109,14 @@ change_charge_limitation_per_cp:
 change_charge_current_per_cp:
   description: 
   fields:
+    mqtt_prefix:
+      name: Prefix for MQTT topic
+      description: respective Prefix on the MQTT server that addresses the respective wallbox
+      default: 'openWB/openWB'
+      example: 'openWB/openWB'
+      required: true
+      selector:
+        text:
     charge_point_id:
       name: Charge point ID
       description: ID of the charge point which shall be enabled / disabled
