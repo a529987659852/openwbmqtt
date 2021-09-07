@@ -14,3 +14,5 @@ In addition, the integration also provides 4 services:
 - Change the gloabl charge mode of openWB (Sofortladen, Min+PV, Nur PV, Stop, Standby)
 - Change charge limitation (not limited / kWh / %SoC) per charge point incl. target values
 - Change charge current per CP
+
+Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
