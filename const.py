@@ -48,6 +48,7 @@ class openwbSensorEntityDescription(SensorEntityDescription):
 
     state: Callable | None = None
     valueMap: dict | None = None
+    mqttTopic: str | None = None
 
 
 # Global sensors applying to the entire wallbox

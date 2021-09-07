@@ -17,6 +17,7 @@ from homeassistant.util import slugify
 from .const import (
     CHARGE_POINTS,
     DOMAIN,
+    MQTT_ROOT_TOPIC,
     SENSORS_GLOBAL,
     SENSORS_PER_LP,
     openwbSensorEntityDescription,
@@ -32,12 +33,16 @@ async def async_setup_entry(
     """Reuse data obtained in the configuration flow so that it can be used when setting up the entries.
     Data flow is config_flow.py --> data --> init.py --> hass.data --> sensor.py --> hass.data"""
     nChargePoints = hass.data[DOMAIN][config.entry_id][CHARGE_POINTS]
+    mqttRoot = hass.data[DOMAIN][config.entry_id][MQTT_ROOT_TOPIC]
     integrationUniqueID = config.unique_id
 
     """Set up sensors for openWB."""
     sensorList = []
     # Global sensors
-    for description in SENSORS_GLOBAL:
+    global_sensors = copy.deepcopy(SENSORS_GLOBAL)
+    for description in global_sensors:
+        description.mqttTopic = f"{mqttRoot}/{description.key}"
+        _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
         sensorList.append(
             openwbSensor(uniqueID=integrationUniqueID, description=description)
         )
@@ -46,6 +51,8 @@ async def async_setup_entry(
     for chargePoint in range(1, nChargePoints + 1):
         local_sensors_per_lp = copy.deepcopy(SENSORS_PER_LP)
         for description in local_sensors_per_lp:
+            description.mqttTopic = f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
+            _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
             sensorList.append(
                 openwbSensor(
                     uniqueID=integrationUniqueID,
@@ -114,5 +121,5 @@ class openwbSensor(SensorEntity):
             self.async_write_ha_state()
 
         await mqtt.async_subscribe(
-            self.hass, self.entity_description.key, message_received, 1
+            self.hass, self.entity_description.mqttTopic, message_received, 1
         )
