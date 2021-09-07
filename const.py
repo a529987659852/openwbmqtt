@@ -7,36 +7,48 @@ from typing import Callable
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
-from homeassistant.components.sensor import (STATE_CLASS_MEASUREMENT,
-                                             STATE_CLASS_TOTAL_INCREASING,
-                                             SensorEntityDescription)
-from homeassistant.const import (DEVICE_CLASS_BATTERY, DEVICE_CLASS_CURRENT,
-                                 DEVICE_CLASS_ENERGY, DEVICE_CLASS_POWER,
-                                 DEVICE_CLASS_VOLTAGE, ELECTRIC_CURRENT_AMPERE,
-                                 ELECTRIC_POTENTIAL_VOLT,
-                                 ENERGY_KILO_WATT_HOUR, LENGTH_KILOMETERS,
-                                 PERCENTAGE, POWER_WATT)
+from homeassistant.components.sensor import (
+    STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING,
+    SensorEntityDescription,
+)
+from homeassistant.const import (
+    DEVICE_CLASS_BATTERY,
+    DEVICE_CLASS_CURRENT,
+    DEVICE_CLASS_ENERGY,
+    DEVICE_CLASS_POWER,
+    DEVICE_CLASS_VOLTAGE,
+    ELECTRIC_CURRENT_AMPERE,
+    ELECTRIC_POTENTIAL_VOLT,
+    ENERGY_KILO_WATT_HOUR,
+    LENGTH_KILOMETERS,
+    PERCENTAGE,
+    POWER_WATT,
+)
 
 # Global parameters
 DOMAIN = "openwbmqtt"
 
-MQTT_ROOT_TOPIC = 'mqttroot'
-MQTT_ROOT_TOPIC_DEFAULT = 'openWB/openWB'
-CHARGE_POINTS = 'chargepoints'
+MQTT_ROOT_TOPIC = "mqttroot"
+MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
+CHARGE_POINTS = "chargepoints"
 DEFAULT_CHARGE_POINTS = 1
 
 DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(MQTT_ROOT_TOPIC, default = MQTT_ROOT_TOPIC_DEFAULT): cv.string,
-        vol.Required(CHARGE_POINTS, default = DEFAULT_CHARGE_POINTS ): cv.positive_int,
+        vol.Required(MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
+        vol.Required(CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS): cv.positive_int,
     }
 )
+
 
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Sensor entity description for openWB"""
+
     state: Callable | None = None
-    valueMap: dict  | None = None
+    valueMap: dict | None = None
+
 
 # Global sensors applying to the entire wallbox
 SENSORS_GLOBAL = [
@@ -46,7 +58,13 @@ SENSORS_GLOBAL = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 0 : 'Sofortladen', 1: 'Min+PV-Laden', 2: 'PV-Laden', 3: 'Stop', 4: 'Standby'},
+        valueMap={
+            0: "Sofortladen",
+            1: "Min+PV-Laden",
+            2: "PV-Laden",
+            3: "Stop",
+            4: "Standby",
+        },
     ),
 ]
 
@@ -98,7 +116,7 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False}
+        valueMap={1: True, 0: False},
     ),
     openwbSensorEntityDescription(
         key="ChargePointEnabled",
@@ -106,7 +124,7 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False}
+        valueMap={1: True, 0: False},
     ),
     openwbSensorEntityDescription(
         key="%SoC",
@@ -142,8 +160,8 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False},
-        icon="mdi:connection"
+        valueMap={1: True, 0: False},
+        icon="mdi:connection",
     ),
     openwbSensorEntityDescription(
         key="boolChargeStat",
@@ -151,8 +169,8 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False},
-        icon="mdi:connection"
+        valueMap={1: True, 0: False},
+        icon="mdi:connection",
     ),
     openwbSensorEntityDescription(
         key="boolChargeAtNight",
@@ -160,17 +178,17 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False},
-        icon='mdi:weather-night'
+        valueMap={1: True, 0: False},
+        icon="mdi:weather-night",
     ),
-# TODO: Conversion of time to timestamp. Currently, the remainder charge time is given as HH:MM
+    # TODO: Conversion of time to timestamp. Currently, the remainder charge time is given as HH:MM
     openwbSensorEntityDescription(
         key="TimeRemaining",
         name="Verbleibende Ladezeit (HH:MM)",
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        icon="mdi:alarm"
+        icon="mdi:alarm",
     ),
     openwbSensorEntityDescription(
         key="strChargePointName",
@@ -178,7 +196,7 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        icon="mdi:form-textbox"
+        icon="mdi:form-textbox",
     ),
     openwbSensorEntityDescription(
         key="kWhDailyCharged",
@@ -193,7 +211,7 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False}
+        valueMap={1: True, 0: False},
     ),
     openwbSensorEntityDescription(
         key="boolDirectChargeModeSoc",
@@ -201,7 +219,7 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
-        valueMap={ 1: True, 0: False}
+        valueMap={1: True, 0: False},
     ),
     openwbSensorEntityDescription(
         key="kWhCounter",
@@ -265,7 +283,7 @@ SENSORS_PER_LP = [
         device_class=DEVICE_CLASS_CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         state_class=STATE_CLASS_MEASUREMENT,
-    ),   
+    ),
     openwbSensorEntityDescription(
         key="APhase3",
         name="Stromstärke (Phase 3)",
