@@ -1,5 +1,5 @@
 # openWBmqtt
-Custom component for home assistant supporting openWB wallbox
+Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles
 
 ## How to add this custom componant to home assistant
 
