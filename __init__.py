@@ -1,13 +1,12 @@
 """The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
-
 import logging
 
-import voluptuous as vol
-
 import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
+# Import global values.
 from .const import CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,14 +14,15 @@ PLATFORMS = ["sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Setup openWB sensors (--> display current data in home assistant) and services (--> change openWB settings)."""
 
-    # # Provide data obtained in the configuration flow so that it can be used when setting up the entries
+    # Provide data obtained in the configuration flow so that it can be used when setting up the entries.
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         MQTT_ROOT_TOPIC: entry.data[MQTT_ROOT_TOPIC],
         CHARGE_POINTS: entry.data[CHARGE_POINTS],
     }
 
-    # Trigger the creation of sensors
+    # Trigger the creation of sensors.
     for platform in PLATFORMS:
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(entry, platform)
@@ -31,13 +31,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Define services that publish data to MQTT. The published data is subscribed by openWB
     and the respective settings are changed."""
 
-    # # Prefix: If the openWB mqtt server is briged to a central mqtt server, a prefix is required.
-    # call.data.get('mqtt_prefix') = entry.data[MQTT_ROOT_TOPIC]
-    # _LOGGER.debug("call.data.get('mqtt_prefix'): %s", call.data.get('mqtt_prefix'))
-
-    # Define functions to execute on service call
     def fun_enable_disable_cp(call):
-        """Enable or disable charge point # --> set/lp#/ChargePointEnabled [0,1]"""
+        """Enable or disable charge point # --> set/lp#/ChargePointEnabled [0,1]."""
         topic = f"{call.data.get('mqtt_prefix')}/set/lp{call.data.get('charge_point_id')}/ChargePointEnabled"
         _LOGGER.debug("topic (enable_disable_cp): %s", topic)
 
@@ -47,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.components.mqtt.publish(topic, "0")
 
     def fun_change_global_charge_mode(call):
-        """Change the wallbox global charge mode --> set/ChargeMode [0, .., 3]"""
+        """Change the wallbox global charge mode --> set/ChargeMode [0, .., 3]."""
         topic = f"{call.data.get('mqtt_prefix')}/set/ChargeMode"
         _LOGGER.debug("topic (change_global_charge_mode): %s", topic)
 
@@ -90,7 +85,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.components.mqtt.publish(topic2, payload2)
 
     def fun_change_charge_current_per_cp(call):
-        """Set the charge current per loading point --> config/set/sofort/lp/#/current [value in A]"""
+        """Set the charge current per loading point --> config/set/sofort/lp/#/current [value in A]."""
         topic = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/current"
         _LOGGER.debug("topic (fun_change_charge_current_per_cp): %s", topic)
 

@@ -1,11 +1,10 @@
-"""Support for openWB sensors through MQTT."""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
 from __future__ import annotations
 
 import copy
 import logging
 
 import voluptuous as vol
-
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -13,7 +12,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
-# Import global parameters
+# Import global values.
 from .const import (
     CHARGE_POINTS,
     DOMAIN,
@@ -29,6 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, config: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
+    """Set up sensors for openWB."""
 
     """Reuse data obtained in the configuration flow so that it can be used when setting up the entries.
     Data flow is config_flow.py --> data --> init.py --> hass.data --> sensor.py --> hass.data"""
@@ -36,9 +36,8 @@ async def async_setup_entry(
     mqttRoot = hass.data[DOMAIN][config.entry_id][MQTT_ROOT_TOPIC]
     integrationUniqueID = config.unique_id
 
-    """Set up sensors for openWB."""
     sensorList = []
-    # Global sensors
+    # Create all global sensors.
     global_sensors = copy.deepcopy(SENSORS_GLOBAL)
     for description in global_sensors:
         description.mqttTopic = f"{mqttRoot}/{description.key}"
@@ -47,11 +46,13 @@ async def async_setup_entry(
             openwbSensor(uniqueID=integrationUniqueID, description=description)
         )
 
-    # Sensors applying to each charge point
+    # Create all sensors for each charge point, respectively.
     for chargePoint in range(1, nChargePoints + 1):
         local_sensors_per_lp = copy.deepcopy(SENSORS_PER_LP)
         for description in local_sensors_per_lp:
-            description.mqttTopic = f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
+            description.mqttTopic = (
+                f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
+            )
             _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
             sensorList.append(
                 openwbSensor(
@@ -66,7 +67,7 @@ async def async_setup_entry(
 
 
 class openwbSensor(SensorEntity):
-    """Representation of an openWB that is updated via MQTT."""
+    """Representation of an openWB sensor that is updated via MQTT."""
 
     entity_description: openwbSensorEntityDescription
 
@@ -99,7 +100,7 @@ class openwbSensor(SensorEntity):
             else:
                 self._attr_native_value = message.payload
 
-            # Map values as defined in the value map dict
+            # Map values as defined in the value map dict.
             if self.entity_description.valueMap is not None:
                 try:
                     self._attr_native_value = self.entity_description.valueMap.get(
@@ -108,7 +109,7 @@ class openwbSensor(SensorEntity):
                 except ValueError:
                     self._attr_native_value = self._attr_native_value
 
-            # Reformat TimeRemaining --> hh:mm
+            # Reformat TimeRemaining --> hh:mm.
             if "TimeRemaining" in self.entity_description.key:
                 if "H" in self._attr_native_value:
                     tmp = self._attr_native_value.split()
@@ -117,7 +118,7 @@ class openwbSensor(SensorEntity):
                     tmp = self._attr_native_value.split()
                     self._attr_native_value = f"00:{int(tmp[0]):02d}"
 
-            # Update entity state with value published on MQTT
+            # Update entity state with value published on MQTT.
             self.async_write_ha_state()
 
         await mqtt.async_subscribe(

@@ -1,12 +1,11 @@
-# The domain of your component. Should be equal to the name of your component.
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable
 
-import voluptuous as vol
-
 import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
@@ -26,14 +25,14 @@ from homeassistant.const import (
     POWER_WATT,
 )
 
-# Global parameters
+# Global values
 DOMAIN = "openwbmqtt"
-
 MQTT_ROOT_TOPIC = "mqttroot"
 MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
 CHARGE_POINTS = "chargepoints"
 DEFAULT_CHARGE_POINTS = 1
 
+# Data schema required by configuration flow
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
@@ -44,14 +43,14 @@ DATA_SCHEMA = vol.Schema(
 
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
-    """Sensor entity description for openWB"""
+    """Enhance the sensor entity description for openWB"""
 
     state: Callable | None = None
     valueMap: dict | None = None
     mqttTopic: str | None = None
 
 
-# Global sensors applying to the entire wallbox
+# List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
     openwbSensorEntityDescription(
         key="global/ChargeMode",
@@ -69,9 +68,9 @@ SENSORS_GLOBAL = [
     ),
 ]
 
-# Sensors applying to each charge point
 """
-TODOs: 
+List of sensors which are relevant for each charge point.
+Not implemented: 
 - boolChargePointConfigured
 - lastRfId
 - boolSocManual
