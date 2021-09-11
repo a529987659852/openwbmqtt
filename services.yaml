@@ -54,7 +54,7 @@ change_global_charge_mode:
             - "Standby"
 
 change_charge_limitation_per_cp:
-  description: 
+  description: Change the submode for a charge point in global mode Sofortladen
   fields:
     mqtt_prefix:
       name: Prefix for MQTT topic
@@ -107,7 +107,7 @@ change_charge_limitation_per_cp:
           step: 10
 
 change_charge_current_per_cp:
-  description: 
+  description: Change charge current for a charge point
   fields:
     mqtt_prefix:
       name: Prefix for MQTT topic
