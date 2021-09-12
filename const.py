@@ -16,6 +16,7 @@ from homeassistant.const import (
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
+    DEVICE_CLASS_TIMESTAMP,
     DEVICE_CLASS_VOLTAGE,
     ELECTRIC_CURRENT_AMPERE,
     ELECTRIC_POTENTIAL_VOLT,
@@ -181,11 +182,10 @@ SENSORS_PER_LP = [
         valueMap={1: True, 0: False},
         icon="mdi:weather-night",
     ),
-    # TODO: Conversion of time to timestamp. Currently, the remainder charge time is given as HH:MM
     openwbSensorEntityDescription(
         key="TimeRemaining",
-        name="Verbleibende Ladezeit (HH:MM)",
-        device_class=None,
+        name="Voraussichtlich vollständig geladen",
+        device_class=DEVICE_CLASS_TIMESTAMP,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
         icon="mdi:alarm",

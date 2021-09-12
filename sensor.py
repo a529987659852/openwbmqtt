@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+from datetime import datetime, timedelta
+from homeassistant.helpers.config_validation import time
 import logging
 
 import voluptuous as vol
@@ -10,7 +12,7 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util import slugify
+from homeassistant.util import dt, slugify
 
 # Import global values.
 from .const import (
@@ -109,14 +111,19 @@ class openwbSensor(SensorEntity):
                 except ValueError:
                     self._attr_native_value = self._attr_native_value
 
-            # Reformat TimeRemaining --> hh:mm.
+            # Reformat TimeRemaining --> timestamp.
             if "TimeRemaining" in self.entity_description.key:
+                now = dt.utcnow()
                 if "H" in self._attr_native_value:
                     tmp = self._attr_native_value.split()
-                    self._attr_native_value = f"{int(tmp[0]):02d}:{int(tmp[2]):02d}"
+                    delta = timedelta(hours = int(tmp[0]), minutes = int(tmp[2]))
+                    self._attr_native_value = now + delta
                 elif "Min" in self._attr_native_value:
                     tmp = self._attr_native_value.split()
-                    self._attr_native_value = f"00:{int(tmp[0]):02d}"
+                    delta = timedelta(minutes = int(tmp[0]))
+                    self._attr_native_value = now + delta
+                else:
+                    self._attr_native_value = None
 
             # Update entity state with value published on MQTT.
             self.async_write_ha_state()
