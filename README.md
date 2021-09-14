@@ -5,9 +5,9 @@ Custom component for home assistant supporting [openWB wallbox](https://openwb.d
 
 Clone the custom component to your custom components folder. Then, in HA, choose Settings -> Integrations -> add the Integration
 
-The integration coding subscribes to MQTT topics <prefix>+/<various values>.
+The integration coding subscribes to MQTT topics "prefix/various values".
 
-The first parameter, mqttroot, defines the <prefix> that shall be applied to all MQTT topics. By default, openWB publishes data to the MQTT topic openWB/# (for example openWB/lp/1/%Soc). In this case, set the prefix to openWB and the integration will subscribe to MQTT data, for example openWB/lp/1/%Soc, or openWB/global/chargeMode, and so on.
+The first parameter, mqttroot, defines the prefix that shall be applied to all MQTT topics. By default, openWB publishes data to the MQTT topic openWB/# (for example openWB/lp/1/%Soc). In this case, set the prefix to openWB and the integration will subscribe to MQTT data, for example openWB/lp/1/%Soc, or openWB/global/chargeMode, and so on.
   
 If your're publishing the data from the openWB mosquitto server to another MQTT server via a bridge, the topics on the other MQTT server are usually prepended with a prefix. If this is the case, also include this prefix into the first configuration parameter, for example somePrefix/openWB. Then, the integration coding will subscribe to MQTT data, for example somePrefix/openWB/global/chargeMode, or somePrefix/openWB/lp/1/%Soc, and so on.
 
