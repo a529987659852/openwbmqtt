@@ -2,11 +2,15 @@
 from __future__ import annotations
 
 import copy
-from datetime import datetime, timedelta
-from homeassistant.helpers.config_validation import time
+from datetime import timedelta
 import logging
 
-import voluptuous as vol
+from homeassistant.const import (
+    ATTR_IDENTIFIERS,
+    ATTR_MANUFACTURER,
+    ATTR_MODEL,
+    ATTR_NAME,
+)
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -18,6 +22,8 @@ from homeassistant.util import dt, slugify
 from .const import (
     CHARGE_POINTS,
     DOMAIN,
+    MANUFACTURER,
+    MODEL,
     MQTT_ROOT_TOPIC,
     SENSORS_GLOBAL,
     SENSORS_PER_LP,
@@ -81,15 +87,24 @@ class openwbSensor(SensorEntity):
         currentChargePoint: int | None = None,
     ) -> None:
         """Initialize the sensor."""
+        # Group all sensors to one device. The device is identified by the prefix (which is unique).
+        self._attr_device_info = {
+            ATTR_NAME: uniqueID,
+            ATTR_IDENTIFIERS: {(DOMAIN, uniqueID)},
+            ATTR_MANUFACTURER : MANUFACTURER,
+            ATTR_MODEL: MODEL,
+        }
         self.entity_description = description
-        # slug = slugify(description.key.replace("/", "_"))
-        self._attr_name = description.name
         if nChargePoints:
             self._attr_unique_id = slugify(
                 f"{uniqueID}-CP{currentChargePoint}-{description.name}"
             )
+            self.entity_id = f"sensor.{uniqueID}-CP{currentChargePoint}-{description.name}"
+            self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{uniqueID}-{description.name}")
+            self.entity_id = f"sensor.{uniqueID}-{description.name}"
+            self._attr_name = description.name
 
     async def async_added_to_hass(self):
         """Subscribe to MQTT events."""

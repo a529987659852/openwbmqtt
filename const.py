@@ -32,6 +32,8 @@ MQTT_ROOT_TOPIC = "mqttroot"
 MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
 CHARGE_POINTS = "chargepoints"
 DEFAULT_CHARGE_POINTS = 1
+MANUFACTURER = 'openWB'
+MODEL = 'openWB'
 
 # Data schema required by configuration flow
 DATA_SCHEMA = vol.Schema(

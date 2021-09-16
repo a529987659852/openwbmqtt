@@ -19,10 +19,7 @@ class openwbmqttConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is None:
             return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
 
-        title = f"{DOMAIN}-{user_input[MQTT_ROOT_TOPIC]}"
-        title = title.replace("/", "_")
-        title = slugify(title)
-
+        title = f"{user_input[MQTT_ROOT_TOPIC]}"
         # Abort if the same integration was already configured.
         await self.async_set_unique_id(title)
         self._abort_if_unique_id_configured()
