@@ -1,5 +1,6 @@
 # openwbmqtt
-Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles. The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information. In addition, the integration provides services that execute actions on the openwb.
+Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles. The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information and displays this informations as sensor entities.
+In addition, the integration provides services that execute actions on the openwb (for example enable/disable a charge point).
 
 # How to add this custom component to home assistant
 
