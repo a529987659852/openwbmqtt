@@ -1,7 +1,5 @@
 {
   "name": "openWB component",
-  "render_readme": "true",
-  "iot_class": "local_polling",
-  "domains": ["sensor"],
-  "dependencies": ["mqtt"],
+  "render_readme": true,
+  "domains": ["sensor"]
 }
