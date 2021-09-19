@@ -1,11 +1,24 @@
-# openWBmqtt
-Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles
+# openwbmqtt
+Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles. The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information and displays this informations as sensor entities.
+In addition, the integration provides services that execute actions on the openwb (for example enable/disable a charge point).
 
-## How to add this custom componant to home assistant
+# How to add this custom component to home assistant
 
+## Step 1: Deploy the Integration Coding to HA
+### Option 1: Via HACS
+Make sure you have [HACS](https://github.com/hacs/integration) installed. Under HACS, choose Integrations. Add this repository as a user-defined reopsitory.
+
+### Option 2: Manually
 Clone the custom component to your custom components folder. Then, in HA, choose Settings -> Integrations -> add the Integration
 
-The integration coding subscribes to MQTT topics `prefix/<various values>`.
+## Step 2: Restart HA
+Restart your HA instance as usual.
+
+## Step 3: Add the Integration
+In HA, choose Settings -> Integrations -> Add Integration to add the integration. HA will display a configuration window. For details, see next section.
+
+# Configuration of the Integration and Additional Information
+The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information.
 
 The first **parameter, mqttroot**, defines the prefix that shall be applied to all MQTT topics. By default, openWB publishes data to the MQTT topic `openWB/#` (for example `openWB/lp/1/%Soc`). In this case, set the prefix to openWB and the integration will subscribe to MQTT data coming from openWB, for example `openWB/lp/1/%Soc`, or `openWB/global/chargeMode`, and so on.
   

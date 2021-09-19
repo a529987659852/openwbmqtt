@@ -1,5 +1,7 @@
 {
   "name": "openWB component",
   "render_readme": "true",
-  "domains": ["sensor"]
+  "domains": [
+    "sensor"
+  ]
 }
