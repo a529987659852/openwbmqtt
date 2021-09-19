@@ -9,7 +9,7 @@ In addition, the integration provides services that execute actions on the openw
 Make sure you have [HACS](https://github.com/hacs/integration) installed. Under HACS, choose Integrations. Add this repository as a user-defined reopsitory.
 
 ### Option 2: Manually
-Clone the custom component to your custom components folder. Then, in HA, choose Settings -> Integrations -> add the Integration
+Clone the custom component to your custom components folder.
 
 ## Step 2: Restart HA
 Restart your HA instance as usual.
