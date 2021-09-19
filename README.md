@@ -15,7 +15,7 @@ Clone the custom component to your custom components folder.
 Restart your HA instance as usual.
 
 ## Step 3: Add the Integration
-In HA, choose Settings -> Integrations -> Add Integration to add the integration. HA will display a configuration window. For details, see next section.
+In HA, choose Settings -> Integrations -> Add Integration to add the integration. HA will display a configuration window. For details, see next section. If the integration is not displayed, it may help to refresh your browser cache.
 
 # Configuration of the Integration and Additional Information
 The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information.
