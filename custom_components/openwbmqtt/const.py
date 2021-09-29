@@ -130,7 +130,7 @@ SENSORS_PER_LP = [
         valueMap={1: True, 0: False},
     ),
     openwbSensorEntityDescription(
-        key="%SoC",
+        key="%Soc",
         name="% SoC",
         device_class=DEVICE_CLASS_BATTERY,
         native_unit_of_measurement=PERCENTAGE,
