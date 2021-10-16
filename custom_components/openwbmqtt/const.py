@@ -76,7 +76,14 @@ SENSORS_GLOBAL = [
         device_class=DEVICE_CLASS_POWER,
         native_unit_of_measurement=POWER_WATT,
         state_class=STATE_CLASS_MEASUREMENT,
-    ),    
+    ),
+    openwbSensorEntityDescription(
+        key="pv/W",
+        name="Leistungsabgabe (Haus PV)",
+        device_class=DEVICE_CLASS_POWER,
+        native_unit_of_measurement=POWER_WATT,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
     openwbSensorEntityDescription(
         key="evu/WhImported",
         name="Energie-Import (Haus)",
