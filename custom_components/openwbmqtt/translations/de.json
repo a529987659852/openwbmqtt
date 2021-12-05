@@ -1,0 +1,18 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Die Integration dieser openWB ist bereits konfiguriert. Bitte gib ein anderes MQTT-Wurzeltopic ein."
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "mqttroot": "MQTT-Wurzeltopic",
+                    "chargepoints": "Anzahl der Ladepunkte der openWB",
+                    "host": "IP-Adresse der openWB (nur Navigation zum openWB-UI)"
+                },
+                "description": "Richte die openWB-Integration ein.",
+                "title": "openWB-Integration in Home Assistant mittels MQTT"
+            }
+        }
+    }
+}

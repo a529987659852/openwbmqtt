@@ -24,7 +24,11 @@ from homeassistant.const import (
     LENGTH_KILOMETERS,
     PERCENTAGE,
     POWER_WATT,
+    ENTITY_CATEGORY_CONFIG,
+    ENTITY_CATEGORY_DIAGNOSTIC,
+    CONF_HOST
 )
+from homeassistant.helpers.entity import EntityDescription
 
 # Global values
 DOMAIN = "openwbmqtt"
@@ -40,6 +44,7 @@ DATA_SCHEMA = vol.Schema(
     {
         vol.Required(MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
         vol.Required(CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS): cv.positive_int,
+        vol.Optional(CONF_HOST, default=""): str,
     }
 )
 
@@ -68,8 +73,17 @@ SENSORS_GLOBAL = [
             3: "Stop",
             4: "Standby",
         },
+        entity_category=ENTITY_CATEGORY_CONFIG,
     ),
-]
+    openwbSensorEntityDescription(
+        key="system/IpAddress",
+        name="IP-Adresse",
+        device_class=None,
+        native_unit_of_measurement=None,
+        state_class=STATE_CLASS_MEASUREMENT,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        icon='mdi:earth'
+    ),]
 
 """
 List of sensors which are relevant for each charge point.
@@ -97,6 +111,7 @@ SENSORS_PER_LP = [
         device_class=DEVICE_CLASS_ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=STATE_CLASS_MEASUREMENT,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="AConfigured",
@@ -104,6 +119,7 @@ SENSORS_PER_LP = [
         device_class=DEVICE_CLASS_CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         state_class=STATE_CLASS_MEASUREMENT,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="kmCharged",
@@ -120,6 +136,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="ChargePointEnabled",
@@ -128,6 +145,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="%Soc",
@@ -156,6 +174,7 @@ SENSORS_PER_LP = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="boolPlugStat",
@@ -165,6 +184,7 @@ SENSORS_PER_LP = [
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
         icon="mdi:connection",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="boolChargeStat",
@@ -174,6 +194,7 @@ SENSORS_PER_LP = [
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
         icon="mdi:connection",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="boolChargeAtNight",
@@ -183,6 +204,7 @@ SENSORS_PER_LP = [
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
         icon="mdi:weather-night",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="TimeRemaining",
@@ -199,6 +221,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
         icon="mdi:form-textbox",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="kWhDailyCharged",
@@ -214,6 +237,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="boolDirectChargeModeSoc",
@@ -222,6 +246,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=None,
         state_class=STATE_CLASS_MEASUREMENT,
         valueMap={1: True, 0: False},
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="kWhCounter",
@@ -236,6 +261,7 @@ SENSORS_PER_LP = [
         device_class=DEVICE_CLASS_BATTERY,
         native_unit_of_measurement=None,
         state_class=PERCENTAGE,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="PfPhase2",
@@ -243,6 +269,7 @@ SENSORS_PER_LP = [
         device_class=DEVICE_CLASS_BATTERY,
         native_unit_of_measurement=None,
         state_class=PERCENTAGE,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="PfPhase3",
@@ -250,6 +277,7 @@ SENSORS_PER_LP = [
         device_class=DEVICE_CLASS_BATTERY,
         native_unit_of_measurement=None,
         state_class=PERCENTAGE,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="VPhase1",

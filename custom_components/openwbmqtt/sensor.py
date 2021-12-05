@@ -10,6 +10,7 @@ from homeassistant.const import (
     ATTR_MANUFACTURER,
     ATTR_MODEL,
     ATTR_NAME,
+    CONF_HOST,
 )
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -17,6 +18,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt, slugify
+
+from homeassistant.helpers.entity import DeviceInfo
 
 # Import global values.
 from .const import (
@@ -40,9 +43,13 @@ async def async_setup_entry(
 
     """Reuse data obtained in the configuration flow so that it can be used when setting up the entries.
     Data flow is config_flow.py --> data --> init.py --> hass.data --> sensor.py --> hass.data"""
-    nChargePoints = hass.data[DOMAIN][config.entry_id][CHARGE_POINTS]
-    mqttRoot = hass.data[DOMAIN][config.entry_id][MQTT_ROOT_TOPIC]
+    # nChargePoints = hass.data[DOMAIN][config.entry_id][CHARGE_POINTS]
+    # mqttRoot = hass.data[DOMAIN][config.entry_id][MQTT_ROOT_TOPIC]
+    # confHost = hass.data[DOMAIN][config.entry_id][CONF_HOST]
     integrationUniqueID = config.unique_id
+    mqttRoot = config.data[MQTT_ROOT_TOPIC]
+    nChargePoints = config.data[CHARGE_POINTS]
+    confHost = config.data[CONF_HOST]
 
     sensorList = []
     # Create all global sensors.
@@ -51,7 +58,7 @@ async def async_setup_entry(
         description.mqttTopic = f"{mqttRoot}/{description.key}"
         _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
         sensorList.append(
-            openwbSensor(uniqueID=integrationUniqueID, description=description)
+            openwbSensor(uniqueID=integrationUniqueID, description=description, confHost=confHost)
         )
 
     # Create all sensors for each charge point, respectively.
@@ -68,6 +75,7 @@ async def async_setup_entry(
                     description=description,
                     nChargePoints=int(nChargePoints),
                     currentChargePoint=chargePoint,
+                    confHost=confHost,
                 )
             )
 
@@ -82,18 +90,20 @@ class openwbSensor(SensorEntity):
     def __init__(
         self,
         uniqueID: str | None,
+        confHost: str | None,
         description: openwbSensorEntityDescription,
         nChargePoints: int | None = None,
         currentChargePoint: int | None = None,
     ) -> None:
         """Initialize the sensor."""
         # Group all sensors to one device. The device is identified by the prefix (which is unique).
-        self._attr_device_info = {
-            ATTR_NAME: uniqueID,
-            ATTR_IDENTIFIERS: {(DOMAIN, uniqueID)},
-            ATTR_MANUFACTURER : MANUFACTURER,
-            ATTR_MODEL: MODEL,
-        }
+        self._attr_device_info = DeviceInfo(
+            name= uniqueID,
+            identifiers= {(DOMAIN, uniqueID)},
+            manufacturer= MANUFACTURER,
+            model= MODEL,
+            configuration_url=f"http://{confHost}/openWB/web/index.php",
+        )
         self.entity_description = description
         if nChargePoints:
             self._attr_unique_id = slugify(
