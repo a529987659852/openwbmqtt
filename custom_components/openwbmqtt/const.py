@@ -21,6 +21,7 @@ from homeassistant.const import (
     ELECTRIC_CURRENT_AMPERE,
     ELECTRIC_POTENTIAL_VOLT,
     ENERGY_KILO_WATT_HOUR,
+    ENERGY_WATT_HOUR,
     LENGTH_KILOMETERS,
     PERCENTAGE,
     POWER_WATT,
@@ -83,11 +84,47 @@ SENSORS_GLOBAL = [
         state_class=STATE_CLASS_MEASUREMENT,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         icon='mdi:earth'
-    ),]
+    ),
+    openwbSensorEntityDescription(
+        key="global/WHouseConsumption",
+        name="Leistungsaufnahme (Haus)",
+        device_class=DEVICE_CLASS_POWER,
+        native_unit_of_measurement=POWER_WATT,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    openwbSensorEntityDescription(
+        key="pv/W",
+        name="Leistungsabgabe (Haus PV)",
+        device_class=DEVICE_CLASS_POWER,
+        native_unit_of_measurement=POWER_WATT,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ),
+    openwbSensorEntityDescription(
+        key="evu/WhImported",
+        name="Energie-Import (Haus)",
+        device_class=DEVICE_CLASS_ENERGY,
+        native_unit_of_measurement=ENERGY_WATT_HOUR,
+        state_class=STATE_CLASS_TOTAL_INCREASING,
+    ),
+    openwbSensorEntityDescription(
+        key="evu/WhExported",
+        name="Energie-Export (Haus)",
+        device_class=DEVICE_CLASS_ENERGY,
+        native_unit_of_measurement=ENERGY_WATT_HOUR,
+        state_class=STATE_CLASS_TOTAL_INCREASING,
+    ),
+    openwbSensorEntityDescription(
+        key="pv/WhCounter",
+        name="Energie-Erzeugt (Haus)",
+        device_class=DEVICE_CLASS_ENERGY,
+        native_unit_of_measurement=ENERGY_WATT_HOUR,
+        state_class=STATE_CLASS_TOTAL_INCREASING,
+    ),
+]
 
 """
 List of sensors which are relevant for each charge point.
-Not implemented: 
+Not implemented:
 - boolChargePointConfigured
 - lastRfId
 - boolSocManual
