@@ -40,9 +40,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.debug("topic (enable_disable_cp): %s", topic)
 
         if call.data.get("selected_status") == "On":
-            hass.components.mqtt.publish(topic, "1")
+            payload = str(1)
+            hass.components.mqtt.publish(hass, topic, payload)
+
         else:
-            hass.components.mqtt.publish(topic, "0")
+            payload = str(0)
+            hass.components.mqtt.publish(hass, topic, payload)
 
     def fun_change_global_charge_mode(call):
         """Change the wallbox global charge mode --> set/ChargeMode [0, .., 3]."""
@@ -59,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             payload = str(3)
         else:
             payload = str(4)
-        hass.components.mqtt.publish(topic, payload)
+        hass.components.mqtt.publish(hass, topic, payload)
 
     def fun_change_charge_limitation_per_cp(call):
         """If box is in state 'Sofortladen', the charge limitation can be finetuned.
@@ -73,19 +76,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         if call.data.get("charge_limitation") == "Not limited":
             payload = str(0)
-            hass.components.mqtt.publish(topic, payload)
+            hass.components.mqtt.publish(hass, topic, payload)
         elif call.data.get("charge_limitation") == "kWh":
             payload = str(1)
             topic2 = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/energyToCharge"
             payload2 = str(call.data.get("energy_to_charge"))
-            hass.components.mqtt.publish(topic, payload)
-            hass.components.mqtt.publish(topic2, payload2)
+            hass.components.mqtt.publish(hass, topic, payload)
+            hass.components.mqtt.publish(hass, topic2, payload2)
         elif call.data.get("charge_limitation") == "SOC":
             payload = str(2)
             topic2 = f"{call.data.get('mqtt_prefix')}/config/set/sofort/lp/{call.data.get('charge_point_id')}/socToChargeTo"
             payload2 = str(call.data.get("required_soc"))
-            hass.components.mqtt.publish(topic, payload)
-            hass.components.mqtt.publish(topic2, payload2)
+            hass.components.mqtt.publish(hass, topic, payload)
+            hass.components.mqtt.publish(hass, topic2, payload2)
 
     def fun_change_charge_current_per_cp(call):
         """Set the charge current per loading point --> config/set/sofort/lp/#/current [value in A]."""
@@ -93,7 +96,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.debug("topic (fun_change_charge_current_per_cp): %s", topic)
 
         payload = str(call.data.get("target_current"))
-        hass.components.mqtt.publish(topic, payload)
+        hass.components.mqtt.publish(hass, topic, payload)
 
     # Register our services with Home Assistant.
     hass.services.async_register(DOMAIN, "enable_disable_cp", fun_enable_disable_cp)
