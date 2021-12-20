@@ -33,3 +33,35 @@ In addition, the integration also provides 4 services:
 - Change charge current per CP
 
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
+
+# Homeassistant configuration
+
+## Adding buttons to change charge mode
+
+If you want to be able to change the charge mode from within lovelace it's easiest to create a script like this:
+
+```
+openwb_mode:
+  alias: Set openWB Charging Mode
+  sequence:
+    - service: openwbmqtt.change_global_charge_mode
+      data:
+        global_charge_mode: '{{chargemode}}'
+        mqtt_prefix: openWB
+  mode: single
+```
+
+In lovelace you can then add an entity-button that will change the `charge_mode`:
+
+```
+type: entity-button
+name: Minpluspv
+show_state: false
+tap_action:
+  action: call-service
+  service: script.openwb_mode
+  service_data:
+    chargemode: Min+PV-Laden
+entity: script.openwb_mode
+```
+
