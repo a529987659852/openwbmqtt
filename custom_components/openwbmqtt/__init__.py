@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from .const import CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["sensor"]
+PLATFORMS = ["sensor", "binary_sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

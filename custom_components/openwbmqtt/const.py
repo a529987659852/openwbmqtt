@@ -11,6 +11,12 @@ from homeassistant.components.sensor import (
     SensorStateClass,
     SensorDeviceClass,
 )
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntity,
+    BinarySensorEntityDescription,
+)
+
 from homeassistant.const import (
     ELECTRIC_CURRENT_AMPERE,
     ELECTRIC_POTENTIAL_VOLT,
@@ -47,14 +53,26 @@ DATA_SCHEMA = vol.Schema(
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
-
     state: Callable | None = None
     valueMap: dict | None = None
     mqttTopic: str | None = None
 
+class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
+    """Enhance the sensor entity description for openWB"""
+    state: Callable | None = None
+    mqttTopic: str | None = None
 
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
+    openwbSensorEntityDescription(
+        key="system/IpAddress",
+        name="IP-Adresse",
+        device_class=None,
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        icon='mdi:earth',
+    ),
     openwbSensorEntityDescription(
         key="global/ChargeMode",
         name="Lademodus",
@@ -70,15 +88,14 @@ SENSORS_GLOBAL = [
         },
         entity_category=ENTITY_CATEGORY_CONFIG,
     ),
-    openwbSensorEntityDescription(
-        key="system/IpAddress",
-        name="IP-Adresse",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-        icon='mdi:earth',
-    ),
+    # openwbSensorEntityDescription(
+    #     key="system/Version",
+    #     name="Version",
+    #     device_class=None,
+    #     native_unit_of_measurement=None,
+    #     state_class=SensorStateClass.MEASUREMENT,
+    #     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    # ), 
     openwbSensorEntityDescription(
         key="global/WHouseConsumption",
         name="Leistungsaufnahme (Haus)",
@@ -167,24 +184,6 @@ SENSORS_PER_LP = [
         icon="mdi:car",
     ),
     openwbSensorEntityDescription(
-        key="ChargeStatus",
-        name="Ladepunkt freigegeben",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    ),
-    openwbSensorEntityDescription(
-        key="ChargePointEnabled",
-        name="Ladepunkt aktiv",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    ),
-    openwbSensorEntityDescription(
         key="%Soc",
         name="% SoC",
         device_class=SensorDeviceClass.BATTERY,
@@ -214,36 +213,6 @@ SENSORS_PER_LP = [
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
-        key="boolPlugStat",
-        name="Steckererkennung (angesteckt)",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        icon="mdi:connection",
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    ),
-    openwbSensorEntityDescription(
-        key="boolChargeStat",
-        name="Steckererkennung (ladend)",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        icon="mdi:connection",
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    ),
-    openwbSensorEntityDescription(
-        key="boolChargeAtNight",
-        name="Nachtladen aktiv",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        icon="mdi:weather-night",
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    ),
-    openwbSensorEntityDescription(
         key="TimeRemaining",
         name="Voraussichtlich vollständig geladen",
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -267,24 +236,6 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
-    ),
-    openwbSensorEntityDescription(
-        key="boolDirectModeChargekWh",
-        name="Energiemengenbegrenzung aktiv (Modus Sofortladen)",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    ),
-    openwbSensorEntityDescription(
-        key="boolDirectChargeModeSoc",
-        name="SoC-Begrenzung aktiv (Modus Sofortladen)",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={1: True, 0: False},
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
     openwbSensorEntityDescription(
         key="kWhCounter",
@@ -364,5 +315,53 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
+    ),
+]
+
+BINARY_SENSORS_PER_LP = [
+    openwbBinarySensorEntityDescription(
+        key="ChargeStatus",
+        name="Ladepunkt freigegeben",
+        device_class=None,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="ChargePointEnabled",
+        name="Ladepunkt aktiv",
+        device_class=None,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="boolDirectModeChargekWh",
+        name="Energiemengenbegrenzung aktiv (Modus Sofortladen)",
+        device_class=None,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="boolDirectChargeModeSoc",
+        name="SoC-Begrenzung aktiv (Modus Sofortladen)",
+        device_class=None,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="boolChargeAtNight",
+        name="Nachtladen aktiv",
+        device_class=None,
+        icon="mdi:weather-night",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="boolPlugStat",
+        name="Steckererkennung (angesteckt)",
+        device_class=None,
+        icon="mdi:connection",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="boolChargeStat",
+        name="Steckererkennung (ladend)",
+        device_class=None,
+        icon="mdi:connection",
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
 ]
