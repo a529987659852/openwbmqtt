@@ -6,30 +6,17 @@ from typing import Callable
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components.sensor import (
-    SensorEntityDescription,
-    SensorStateClass,
-    SensorDeviceClass,
-)
-from homeassistant.components.binary_sensor import (
-    BinarySensorDeviceClass,
-    BinarySensorEntity,
-    BinarySensorEntityDescription,
-)
-
-from homeassistant.const import (
-    ELECTRIC_CURRENT_AMPERE,
-    ELECTRIC_POTENTIAL_VOLT,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_WATT_HOUR,
-    LENGTH_KILOMETERS,
-    PERCENTAGE,
-    POWER_WATT,
-    ENTITY_CATEGORY_CONFIG,
-    ENTITY_CATEGORY_DIAGNOSTIC,
-    CONF_HOST
-)
-from homeassistant.helpers.entity import EntityDescription
+from homeassistant.components.binary_sensor import \
+    BinarySensorEntityDescription
+from homeassistant.components.sensor import (SensorDeviceClass,
+                                             SensorEntityDescription,
+                                             SensorStateClass)
+from homeassistant.const import (ELECTRIC_CURRENT_AMPERE,
+                                 ELECTRIC_POTENTIAL_VOLT,
+                                 ENERGY_KILO_WATT_HOUR, ENERGY_WATT_HOUR,
+                                 ENTITY_CATEGORY_CONFIG,
+                                 ENTITY_CATEGORY_DIAGNOSTIC, LENGTH_KILOMETERS,
+                                 PERCENTAGE, POWER_WATT)
 
 # Global values
 DOMAIN = "openwbmqtt"
@@ -45,7 +32,6 @@ DATA_SCHEMA = vol.Schema(
     {
         vol.Required(MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
         vol.Required(CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS): cv.positive_int,
-        vol.Optional(CONF_HOST, default=""): str,
     }
 )
 
@@ -72,6 +58,15 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         icon='mdi:earth',
+    ),
+    openwbSensorEntityDescription(
+        key="system/Version",
+        name="Version",
+        device_class=None,
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        icon='mdi:folder-clock',
     ),
     openwbSensorEntityDescription(
         key="global/ChargeMode",

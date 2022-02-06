@@ -1,29 +1,16 @@
 """The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
 import logging
-from homeassistant.const import CONF_HOST
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 # Import global values.
-from .const import CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor", "binary_sensor"]
 
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Setup openWB sensors (--> display current data in home assistant) and services (--> change openWB settings)."""
-    """
-    # Provide data obtained in the configuration flow so that it can be used when setting up the entries.
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
-        MQTT_ROOT_TOPIC: entry.data[MQTT_ROOT_TOPIC],
-        CHARGE_POINTS: entry.data[CHARGE_POINTS],
-        CONF_HOST: entry.data[CONF_HOST],
-    }
-    """   
 
     # Trigger the creation of sensors.
     for platform in PLATFORMS:
