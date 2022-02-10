@@ -45,13 +45,14 @@ async def async_setup_entry(
                     nChargePoints=int(nChargePoints),
                     currentChargePoint=chargePoint,
                     device_friendly_name=integrationUniqueID,
+                    mqtt_root=mqttRoot,
                 )
             )
 
     async_add_entities(sensorList)
 
 
-class openwbBinarySensor(OpenWBBaseEntity,BinarySensorEntity):
+class openwbBinarySensor(OpenWBBaseEntity, BinarySensorEntity):
     """Representation of an openWB sensor that is updated via MQTT."""
 
     entity_description: openwbBinarySensorEntityDescription
@@ -60,6 +61,7 @@ class openwbBinarySensor(OpenWBBaseEntity,BinarySensorEntity):
         self,
         uniqueID: str | None,
         device_friendly_name: str,
+        mqtt_root: str,
         description: openwbBinarySensorEntityDescription,
         nChargePoints: int | None = None,
         currentChargePoint: int | None = None,
@@ -68,15 +70,18 @@ class openwbBinarySensor(OpenWBBaseEntity,BinarySensorEntity):
 
         """Initialize the sensor and the openWB device."""
         super().__init__(
-            device_friendly_name = device_friendly_name,
-            )
+            device_friendly_name=device_friendly_name,
+            mqtt_root=mqtt_root,
+        )
 
         self.entity_description = description
         if nChargePoints:
             self._attr_unique_id = slugify(
                 f"{uniqueID}-CP{currentChargePoint}-{description.name}"
             )
-            self.entity_id = f"binary_sensor.{uniqueID}-CP{currentChargePoint}-{description.name}"
+            self.entity_id = (
+                f"binary_sensor.{uniqueID}-CP{currentChargePoint}-{description.name}"
+            )
             self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{uniqueID}-{description.name}")

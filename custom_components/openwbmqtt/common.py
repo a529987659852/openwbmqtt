@@ -8,9 +8,12 @@ class OpenWBBaseEntity:
 
     def __init__(self,
         device_friendly_name: str,
+        mqtt_root: str,
         ) -> None:
         """Init device info class."""
         self.device_friendly_name = device_friendly_name
+        self.mqtt_root = mqtt_root
+
 
     @property
     def device_info(self) -> DeviceInfo:

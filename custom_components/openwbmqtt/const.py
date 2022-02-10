@@ -8,15 +8,25 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.binary_sensor import \
     BinarySensorEntityDescription
+from homeassistant.components.number import NumberEntityDescription
+from homeassistant.components.select import SelectEntityDescription
 from homeassistant.components.sensor import (SensorDeviceClass,
                                              SensorEntityDescription,
                                              SensorStateClass)
+from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.const import (ELECTRIC_CURRENT_AMPERE,
                                  ELECTRIC_POTENTIAL_VOLT,
                                  ENERGY_KILO_WATT_HOUR, ENERGY_WATT_HOUR,
                                  ENTITY_CATEGORY_CONFIG,
                                  ENTITY_CATEGORY_DIAGNOSTIC, LENGTH_KILOMETERS,
-                                 PERCENTAGE, POWER_WATT)
+                                 PERCENTAGE, POWER_WATT, Platform)
+
+PLATFORMS = [Platform.SELECT, 
+    Platform.SENSOR, 
+    Platform.BINARY_SENSOR, 
+    Platform.NUMBER,
+    Platform.SWITCH,
+    ]
 
 # Global values
 DOMAIN = "openwbmqtt"
@@ -43,10 +53,33 @@ class openwbSensorEntityDescription(SensorEntityDescription):
     valueMap: dict | None = None
     mqttTopic: str | None = None
 
+@dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
     state: Callable | None = None
     mqttTopic: str | None = None
+
+@dataclass
+class openwbSelectEntityDescription(SelectEntityDescription):
+    """Enhance the select entity description for openWB"""
+    valueMapCommand: dict | None = None
+    valueMapCurrentValue: dict | None = None
+    mqttTopicCommand: str | None = None
+    mqttTopicCurrentValue: str | None = None
+    modes: list | None = None
+
+@dataclass
+class openwbSwitchEntityDescription(SwitchEntityDescription):
+    """Enhance the select entity description for openWB"""
+    mqttTopicCommand: str | None = None
+    mqttTopicCurrentValue: str | None = None
+
+@dataclass
+class openWBNumberEntityDescription(NumberEntityDescription):
+    """Enhance the number entity description for openWB"""
+    mqttTopicCommand: str | None = None
+    mqttTopicCurrentValue: str | None = None
+
 
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
@@ -68,29 +101,21 @@ SENSORS_GLOBAL = [
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         icon='mdi:folder-clock',
     ),
-    openwbSensorEntityDescription(
-        key="global/ChargeMode",
-        name="Lademodus",
-        device_class=None,
-        native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        valueMap={
-            0: "Sofortladen",
-            1: "Min+PV-Laden",
-            2: "PV-Laden",
-            3: "Stop",
-            4: "Standby",
-        },
-        entity_category=ENTITY_CATEGORY_CONFIG,
-    ),
     # openwbSensorEntityDescription(
-    #     key="system/Version",
-    #     name="Version",
+    #     key="global/ChargeMode",
+    #     name="Lademodus",
     #     device_class=None,
     #     native_unit_of_measurement=None,
     #     state_class=SensorStateClass.MEASUREMENT,
-    #     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-    # ), 
+    #     valueMap={
+    #         0: "Sofortladen",
+    #         1: "Min+PV-Laden",
+    #         2: "PV-Laden",
+    #         3: "Stop",
+    #         4: "Standby",
+    #     },
+    #     entity_category=ENTITY_CATEGORY_CONFIG,
+    # ),
     openwbSensorEntityDescription(
         key="global/WHouseConsumption",
         name="Leistungsaufnahme (Haus)",
@@ -359,4 +384,114 @@ BINARY_SENSORS_PER_LP = [
         icon="mdi:connection",
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     ),
+]
+
+SELECTS_GLOBAL = [
+    openwbSelectEntityDescription( 
+        key="global/ChargeMode",
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        name="Lademodus",
+        valueMapCurrentValue={
+            0: "Sofortladen",
+            1: "Min+PV-Laden",
+            2: "Nur PV-Laden",
+            3: "Stop",
+            4: "Standby",
+        },
+        valueMapCommand={
+            "Sofortladen": 0,
+            "Min+PV-Laden": 1,
+            "Nur PV-Laden": 2,
+            "Stop": 3,
+            "Standby": 4,
+        },
+        mqttTopicCommand="set/ChargeMode",
+        mqttTopicCurrentValue="global/ChargeMode",
+        modes = [
+            "Sofortladen",
+            "Min+PV-Laden",
+            "Nur PV-Laden",
+            "Stop",
+            "Standby"
+        ],
+    ),
+]
+
+SELECTS_PER_LP = [
+    openwbSelectEntityDescription(
+        key="chargeLimitation", # TODO: find out which topic
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        name="Ladelimitierung",
+        valueMapCurrentValue={
+            0: "Not limited",
+            1: "kWh",
+            2: "SOC",
+        },
+        valueMapCommand={
+            "Not limited": 0,
+            "kWh": 1,
+            "SOC": 2,
+        },
+        mqttTopicCommand="chargeLimitation",
+        mqttTopicCurrentValue="chargeLimitation", # TODO: find out which topic
+        modes = [
+            "Not limited",
+            "kWh",
+            "SOC",
+        ],
+    ),
+]
+
+SWITCHES_PER_LP = [
+    openwbSwitchEntityDescription(
+        key="ChargePointEnabled",
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        name = "Ladepunkt aktiv",
+        mqttTopicCommand="ChargePointEnabled",
+        mqttTopicCurrentValue="ChargePointEnabled",
+    ),
+
+]
+
+NUMBERS_PER_LP = [
+    openWBNumberEntityDescription(
+        key="AConfigured",
+        name="Ladestrom (Soll)",
+        unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        device_class='Power',
+        min_value=6.0,
+        max_value=16.0,
+        step=1.0,
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        # icon=
+        mqttTopicCommand="current",
+        mqttTopicCurrentValue=" ", # TODO: Which topid?
+    ),
+    openWBNumberEntityDescription(
+        key="energyToCharge", # TODO: which topic?
+        name="Zu ladende Energie",
+        unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        device_class='Energy',
+        min_value=10.0,
+        max_value=50.0,
+        step=10.0,
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        # icon=
+        mqttTopicCommand="energyToCharge",
+        mqttTopicCurrentValue=" ", # TODO: Which topic?
+    ),
+    openWBNumberEntityDescription(
+        key="AConfigured",
+        name="Laden bis x %",
+        unit_of_measurement=PERCENTAGE,
+        device_class="Battery",
+        min_value=10.0,
+        max_value=100.0,
+        step=10.0,
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        # icon=
+        mqttTopicCommand="socToChargeTo",
+        mqttTopicCurrentValue=" ", # TODO: Which topid?
+    ),
+
 ]

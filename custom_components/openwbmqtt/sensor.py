@@ -23,9 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, 
-    config: ConfigEntry, 
-    async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, config: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up sensors for openWB."""
 
@@ -40,10 +38,12 @@ async def async_setup_entry(
         description.mqttTopic = f"{mqttRoot}/{description.key}"
         _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
         sensorList.append(
-            openwbSensor(uniqueID=integrationUniqueID, 
-                description=description, 
+            openwbSensor(
+                uniqueID=integrationUniqueID,
+                description=description,
                 device_friendly_name=integrationUniqueID,
-                )
+                mqtt_root=mqttRoot,
+            )
         )
 
     # Create all sensors for each charge point, respectively.
@@ -61,6 +61,7 @@ async def async_setup_entry(
                     nChargePoints=int(nChargePoints),
                     currentChargePoint=chargePoint,
                     device_friendly_name=integrationUniqueID,
+                    mqtt_root=mqttRoot,
                 )
             )
 
@@ -76,14 +77,16 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
         self,
         uniqueID: str | None,
         device_friendly_name: str,
+        mqtt_root: str,
         description: openwbSensorEntityDescription,
         nChargePoints: int | None = None,
         currentChargePoint: int | None = None,
     ) -> None:
         """Initialize the sensor and the openWB device."""
         super().__init__(
-            device_friendly_name = device_friendly_name,
-            )
+            device_friendly_name=device_friendly_name,
+            mqtt_root=mqtt_root,
+        )
 
         self.entity_description = description
 
@@ -91,7 +94,9 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
             self._attr_unique_id = slugify(
                 f"{uniqueID}-CP{currentChargePoint}-{description.name}"
             )
-            self.entity_id = f"sensor.{uniqueID}-CP{currentChargePoint}-{description.name}"
+            self.entity_id = (
+                f"sensor.{uniqueID}-CP{currentChargePoint}-{description.name}"
+            )
             self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{uniqueID}-{description.name}")
@@ -119,30 +124,35 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 now = dt.utcnow()
                 if "H" in self._attr_native_value:
                     tmp = self._attr_native_value.split()
-                    delta = timedelta(hours = int(tmp[0]), minutes = int(tmp[2]))
+                    delta = timedelta(hours=int(tmp[0]), minutes=int(tmp[2]))
                     self._attr_native_value = now + delta
                 elif "Min" in self._attr_native_value:
                     tmp = self._attr_native_value.split()
-                    delta = timedelta(minutes = int(tmp[0]))
+                    delta = timedelta(minutes=int(tmp[0]))
                     self._attr_native_value = now + delta
                 else:
                     self._attr_native_value = None
             # If MQTT message contains IP --> set up configuration_url to visit the device
-            elif 'ip_adresse' in self.entity_id:
-                    device_registry = async_get_dev_reg(self.hass)
-                    device = device_registry.async_get_device(self.device_info.get("identifiers"))                    
-                    device_registry.async_update_device(
-                        device.id,
-                        configuration_url=f"http://{message.payload}/openWB/web/index.php")
-                    device_registry._update_device
+            elif "ip_adresse" in self.entity_id:
+                device_registry = async_get_dev_reg(self.hass)
+                device = device_registry.async_get_device(
+                    self.device_info.get("identifiers")
+                )
+                device_registry.async_update_device(
+                    device.id,
+                    configuration_url=f"http://{message.payload}/openWB/web/index.php",
+                )
+                device_registry._update_device
             # If MQTT message contains version --> set sw_version of the device
-            elif 'version' in self.entity_id:
-                    device_registry = async_get_dev_reg(self.hass)
-                    device = device_registry.async_get_device(self.device_info.get("identifiers"))                    
-                    device_registry.async_update_device(
-                        device.id,
-                        sw_version = message.payload)
-                    device_registry._update_device
+            elif "version" in self.entity_id:
+                device_registry = async_get_dev_reg(self.hass)
+                device = device_registry.async_get_device(
+                    self.device_info.get("identifiers")
+                )
+                device_registry.async_update_device(
+                    device.id, sw_version=message.payload
+                )
+                device_registry._update_device
 
             # Update entity state with value published on MQTT.
             self.async_write_ha_state()
