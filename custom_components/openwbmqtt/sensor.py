@@ -2,24 +2,28 @@
 from __future__ import annotations
 
 import copy
-import logging
 from datetime import timedelta
+import logging
 
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import \
-    async_get as async_get_dev_reg
+from homeassistant.helpers.device_registry import async_get as async_get_dev_reg
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util import dt, slugify
 from homeassistant.helpers.typing import StateType
-
+from homeassistant.util import dt, slugify
 
 from .common import OpenWBBaseEntity
+
 # Import global values.
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SENSORS_GLOBAL,
-                    SENSORS_PER_LP, openwbSensorEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    SENSORS_GLOBAL,
+    SENSORS_PER_LP,
+    openwbSensorEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

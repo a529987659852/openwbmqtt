@@ -4,15 +4,19 @@ import copy
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity, DOMAIN
+from homeassistant.components.switch import DOMAIN, SwitchDeviceClass, SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SWITCHES_PER_LP,
-                    openwbSwitchEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    SWITCHES_PER_LP,
+    openwbSwitchEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

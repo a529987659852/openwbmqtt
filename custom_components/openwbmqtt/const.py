@@ -4,22 +4,30 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components.binary_sensor import \
-    BinarySensorEntityDescription
+
+from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.number import NumberEntityDescription
 from homeassistant.components.select import SelectEntityDescription
-from homeassistant.components.sensor import (SensorDeviceClass,
-                                             SensorEntityDescription,
-                                             SensorStateClass)
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.components.switch import SwitchEntityDescription
-from homeassistant.const import (ELECTRIC_CURRENT_AMPERE,
-                                 ELECTRIC_POTENTIAL_VOLT,
-                                 ENERGY_KILO_WATT_HOUR, ENERGY_WATT_HOUR,
-                                 ENTITY_CATEGORY_CONFIG,
-                                 ENTITY_CATEGORY_DIAGNOSTIC, LENGTH_KILOMETERS,
-                                 PERCENTAGE, POWER_WATT, Platform)
+from homeassistant.const import (
+    ELECTRIC_CURRENT_AMPERE,
+    ELECTRIC_POTENTIAL_VOLT,
+    ENERGY_KILO_WATT_HOUR,
+    ENERGY_WATT_HOUR,
+    ENTITY_CATEGORY_CONFIG,
+    ENTITY_CATEGORY_DIAGNOSTIC,
+    LENGTH_KILOMETERS,
+    PERCENTAGE,
+    POWER_WATT,
+    Platform,
+)
+import homeassistant.helpers.config_validation as cv
 
 PLATFORMS = [Platform.SELECT, 
     Platform.SENSOR, 
@@ -102,21 +110,6 @@ SENSORS_GLOBAL = [
         entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         icon='mdi:folder-clock',
     ),
-    # openwbSensorEntityDescription(
-    #     key="global/ChargeMode",
-    #     name="Lademodus",
-    #     device_class=None,
-    #     native_unit_of_measurement=None,
-    #     state_class=SensorStateClass.MEASUREMENT,
-    #     valueMap={
-    #         0: "Sofortladen",
-    #         1: "Min+PV-Laden",
-    #         2: "PV-Laden",
-    #         3: "Stop",
-    #         4: "Standby",
-    #     },
-    #     entity_category=ENTITY_CATEGORY_CONFIG,
-    # ),
     openwbSensorEntityDescription(
         key="global/WHouseConsumption",
         name="Leistungsaufnahme (Haus)",
@@ -162,18 +155,6 @@ SENSORS_GLOBAL = [
     ),
 ]
 
-"""
-List of sensors which are relevant for each charge point.
-Not implemented:
-- boolChargePointConfigured
-- lastRfId
-- boolSocManual
-- pluddedladungakt
-- boolSocConfigured
-- AutolockCondfigured
-- AutolockStatus
-- boolFinishAtTimeChargeActive
-"""
 SENSORS_PER_LP = [
     openwbSensorEntityDescription(
         key="W",

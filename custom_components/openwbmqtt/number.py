@@ -1,27 +1,38 @@
 from __future__ import annotations
 
 import copy
-import logging
 from dataclasses import dataclass
+import logging
 from os import device_encoding, stat
 
+from sqlalchemy import desc
+
 from homeassistant.components import mqtt
-from homeassistant.components.number import NumberEntity, NumberMode, DOMAIN
+from homeassistant.components.number import DOMAIN, NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (DEVICE_DEFAULT_NAME, ELECTRIC_CURRENT_AMPERE,
-                                 ENERGY_KILO_WATT_HOUR, ENTITY_CATEGORY_CONFIG,
-                                 PERCENTAGE)
+from homeassistant.const import (
+    DEVICE_DEFAULT_NAME,
+    ELECTRIC_CURRENT_AMPERE,
+    ENERGY_KILO_WATT_HOUR,
+    ENTITY_CATEGORY_CONFIG,
+    PERCENTAGE,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util import slugify
-from sqlalchemy import desc
 
 from .common import OpenWBBaseEntity
+
 # Import global values.
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, NUMBERS_PER_LP, NUMBERS_GLOBAL,
-                    openWBNumberEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    NUMBERS_GLOBAL,
+    NUMBERS_PER_LP,
+    openWBNumberEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
