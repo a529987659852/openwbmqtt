@@ -31,7 +31,7 @@ PLATFORMS = [Platform.SELECT,
 # Global values
 DOMAIN = "openwbmqtt"
 MQTT_ROOT_TOPIC = "mqttroot"
-MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
+MQTT_ROOT_TOPIC_DEFAULT = "openWB"
 CHARGE_POINTS = "chargepoints"
 DEFAULT_CHARGE_POINTS = 1
 MANUFACTURER = 'openWB'
@@ -49,15 +49,15 @@ DATA_SCHEMA = vol.Schema(
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
-    state: Callable | None = None
+    value_fn: Callable | None = None
     valueMap: dict | None = None
-    mqttTopic: str | None = None
+    mqttTopicCurrentValue: str | None = None
 
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
     state: Callable | None = None
-    mqttTopic: str | None = None
+    mqttTopicCurrentValue: str | None = None
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
@@ -79,6 +79,7 @@ class openWBNumberEntityDescription(NumberEntityDescription):
     """Enhance the number entity description for openWB"""
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
+    mqttTopicChargeMode: str | None = None
 
 
 # List of global sensors that are relevant to the entire wallbox
@@ -136,25 +137,28 @@ SENSORS_GLOBAL = [
         key="evu/WhImported",
         name="Energie-Import (Haus)",
         device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_WATT_HOUR,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
     openwbSensorEntityDescription(
         key="evu/WhExported",
         name="Energie-Export (Haus)",
         device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_WATT_HOUR,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
         name="Energie-Erzeugt (Haus)",
         device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_WATT_HOUR,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
 ]
 
@@ -189,7 +193,7 @@ SENSORS_PER_LP = [
     ),
     openwbSensorEntityDescription(
         key="AConfigured",
-        name="Ladestrom (Soll)",
+        name="Ladestrom (Ist)",
         device_class=SensorDeviceClass.CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -216,6 +220,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda x: round(float(x), 1)
     ),
     openwbSensorEntityDescription(
         key="kWhActualCharged",
@@ -223,6 +228,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda x: round(float(x), 1)
     ),
     openwbSensorEntityDescription(
         key="countPhasesInUse",
@@ -256,6 +262,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda x: round(float(x), 1)
     ),
     openwbSensorEntityDescription(
         key="kWhCounter",
@@ -263,6 +270,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda x: round(float(x), 1)
     ),
     openwbSensorEntityDescription(
         key="PfPhase1",
@@ -394,14 +402,14 @@ SELECTS_GLOBAL = [
         valueMapCurrentValue={
             0: "Sofortladen",
             1: "Min+PV-Laden",
-            2: "Nur PV-Laden",
+            2: "PV-Laden",
             3: "Stop",
             4: "Standby",
         },
         valueMapCommand={
             "Sofortladen": 0,
             "Min+PV-Laden": 1,
-            "Nur PV-Laden": 2,
+            "PV-Laden": 2,
             "Stop": 3,
             "Standby": 4,
         },
@@ -410,7 +418,7 @@ SELECTS_GLOBAL = [
         modes = [
             "Sofortladen",
             "Min+PV-Laden",
-            "Nur PV-Laden",
+            "PV-Laden",
             "Stop",
             "Standby"
         ],
@@ -418,26 +426,26 @@ SELECTS_GLOBAL = [
 ]
 
 SELECTS_PER_LP = [
-    openwbSelectEntityDescription(
-        key="chargeLimitation", # TODO: find out which topic
+     openwbSelectEntityDescription(
+        key="chargeLimitation",
         entity_category=ENTITY_CATEGORY_CONFIG,
         name="Ladelimitierung",
         valueMapCurrentValue={
-            0: "Not limited",
-            1: "kWh",
-            2: "SOC",
+            0: "Keine",
+            1: "Energiemenge",
+            2: "SoC",
         },
         valueMapCommand={
-            "Not limited": 0,
-            "kWh": 1,
-            "SOC": 2,
+            "Keine": 0,
+            "Energiemenge": 1,
+            "SoC": 2,
         },
         mqttTopicCommand="chargeLimitation",
-        mqttTopicCurrentValue="chargeLimitation", # TODO: find out which topic
+        mqttTopicCurrentValue=None,
         modes = [
-            "Not limited",
-            "kWh",
-            "SOC",
+            "Keine",
+            "Energiemenge",
+            "SoC",
         ],
     ),
 ]
@@ -453,10 +461,27 @@ SWITCHES_PER_LP = [
 
 ]
 
+NUMBERS_GLOBAL = [
+        openWBNumberEntityDescription(
+        key="minCurrentMinPv",
+        name="Min+PV-Laden Stromstärke",
+        unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        device_class='Power',
+        min_value=6.0,
+        max_value=16.0,
+        step=1.0,
+        entity_category=ENTITY_CATEGORY_CONFIG,
+        # icon=
+        mqttTopicCommand="minCurrentMinPv",
+        mqttTopicCurrentValue="minCurrentMinPv",
+        mqttTopicChargeMode = "pv",
+    ),
+]
+
 NUMBERS_PER_LP = [
     openWBNumberEntityDescription(
-        key="AConfigured",
-        name="Ladestrom (Soll)",
+        key="current",
+        name="Sofortladen Stromstärke",
         unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         device_class='Power',
         min_value=6.0,
@@ -465,33 +490,35 @@ NUMBERS_PER_LP = [
         entity_category=ENTITY_CATEGORY_CONFIG,
         # icon=
         mqttTopicCommand="current",
-        mqttTopicCurrentValue=" ", # TODO: Which topid?
+        mqttTopicCurrentValue="current",
+        mqttTopicChargeMode = "sofort",
     ),
     openWBNumberEntityDescription(
-        key="energyToCharge", # TODO: which topic?
-        name="Zu ladende Energie",
+        key="energyToCharge",
+        name="Lademengenbegrenzung (Energie)",
         unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         device_class='Energy',
-        min_value=10.0,
-        max_value=50.0,
-        step=10.0,
+        min_value=2.0,
+        max_value=100.0,
+        step=2.0,
         entity_category=ENTITY_CATEGORY_CONFIG,
         # icon=
         mqttTopicCommand="energyToCharge",
-        mqttTopicCurrentValue=" ", # TODO: Which topic?
+        mqttTopicCurrentValue="energyToCharge",
+        mqttTopicChargeMode = "sofort",
     ),
     openWBNumberEntityDescription(
-        key="AConfigured",
-        name="Laden bis x %",
+        key="socToChargeTo",
+        name="Lademengenbegrenzung (SoC)",
         unit_of_measurement=PERCENTAGE,
         device_class="Battery",
-        min_value=10.0,
+        min_value=5.0,
         max_value=100.0,
-        step=10.0,
+        step=5.0,
         entity_category=ENTITY_CATEGORY_CONFIG,
         # icon=
         mqttTopicCommand="socToChargeTo",
-        mqttTopicCurrentValue=" ", # TODO: Which topid?
+        mqttTopicCurrentValue="socToChargeTo",
+        mqttTopicChargeMode = "sofort",
     ),
-
 ]

@@ -5,14 +5,14 @@ import copy
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.select import SelectEntity
+from homeassistant.components.select import SelectEntity, DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
-from .const import (CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC, SELECTS_GLOBAL,
+from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SELECTS_GLOBAL,
                     SELECTS_PER_LP, openwbSelectEntityDescription)
 
 _LOGGER = logging.getLogger(__name__)
@@ -43,14 +43,14 @@ async def async_setup_entry(
                 mqtt_root=mqttRoot,
             )
         )
-
     for chargePoint in range(1, nChargePoints + 1):
         local_selects_per_lp = copy.deepcopy(SELECTS_PER_LP)
         for description in local_selects_per_lp:
             description.mqttTopicCommand = f"{mqttRoot}/config/set/sofort/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
-            description.mqttTopicCurrentValue = (
-                f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
-            )
+            if description.mqttTopicCurrentValue is not None:
+                description.mqttTopicCurrentValue = (
+                    f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
+                )
             selectList.append(
                 openwbSelect(
                     unique_id=integrationUniqueID,
@@ -61,7 +61,6 @@ async def async_setup_entry(
                     mqtt_root=mqttRoot,
                 )
             )
-
     async_add_entities(selectList)
 
 
@@ -76,8 +75,8 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
         device_friendly_name: str,
         description: openwbSelectEntityDescription,
         mqtt_root: str,
-        currentChargePoint: int | None = 1,
-        nChargePoints: int | None = 1,
+        currentChargePoint: int | None = None,
+        nChargePoints: int | None = None,
     ) -> None:
         """Initialize the sensor and the openWB device."""
         super().__init__(
@@ -92,12 +91,12 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
                 f"{unique_id}-CP{currentChargePoint}-{description.name}"
             )
             self.entity_id = (
-                f"select.{unique_id}-CP{currentChargePoint}-{description.name}"
+                f"{DOMAIN}.{unique_id}-CP{currentChargePoint}-{description.name}"
             )
             self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{unique_id}-{description.name}")
-            self.entity_id = f"select.{unique_id}-{description.name}"
+            self.entity_id = f"{DOMAIN}.{unique_id}-{description.name}"
             self._attr_name = description.name
 
         self._attr_options = description.modes
@@ -121,12 +120,13 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
             self.async_write_ha_state()
 
         # Subscribe to MQTT topic and connect callack message
-        await mqtt.async_subscribe(
-            self.hass,
-            self.entity_description.mqttTopicCurrentValue,
-            message_received,
-            1,
-        )
+        if self.entity_description.mqttTopicCurrentValue is not None:
+            await mqtt.async_subscribe(
+                self.hass,
+                self.entity_description.mqttTopicCurrentValue,
+                message_received,
+                1,
+            )
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""

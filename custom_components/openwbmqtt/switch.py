@@ -4,14 +4,14 @@ import copy
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
+from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity, DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
-from .const import (CHARGE_POINTS, DOMAIN, MQTT_ROOT_TOPIC, SWITCHES_PER_LP,
+from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SWITCHES_PER_LP,
                     openwbSwitchEntityDescription)
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,8 +65,8 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
         device_friendly_name: str,
         description: openwbSwitchEntityDescription,
         mqtt_root: str,
-        currentChargePoint: int | None = 1,
-        nChargePoints: int | None = 1,
+        currentChargePoint: int | None = None,
+        nChargePoints: int | None = None,
     ) -> None:
         """Initialize the sensor and the openWB device."""
         super().__init__(
@@ -81,12 +81,12 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
                 f"{unique_id}-CP{currentChargePoint}-{description.name}"
             )
             self.entity_id = (
-                f"switch.{unique_id}-CP{currentChargePoint}-{description.name}"
+                f"{DOMAIN}.{unique_id}-CP{currentChargePoint}-{description.name}"
             )
             self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{unique_id}-{description.name}")
-            self.entity_id = f"switch.{unique_id}-{description.name}"
+            self.entity_id = f"{DOMAIN}.{unique_id}-{description.name}"
             self._attr_name = description.name
 
     async def async_added_to_hass(self):

@@ -13,6 +13,8 @@ from homeassistant.helpers.device_registry import \
     async_get as async_get_dev_reg
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt, slugify
+from homeassistant.helpers.typing import StateType
+
 
 from .common import OpenWBBaseEntity
 # Import global values.
@@ -35,8 +37,8 @@ async def async_setup_entry(
     # Create all global sensors.
     global_sensors = copy.deepcopy(SENSORS_GLOBAL)
     for description in global_sensors:
-        description.mqttTopic = f"{mqttRoot}/{description.key}"
-        _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
+        description.mqttTopicCurrentValue = f"{mqttRoot}/{description.key}"
+        _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
         sensorList.append(
             openwbSensor(
                 uniqueID=integrationUniqueID,
@@ -50,10 +52,10 @@ async def async_setup_entry(
     for chargePoint in range(1, nChargePoints + 1):
         local_sensors_per_lp = copy.deepcopy(SENSORS_PER_LP)
         for description in local_sensors_per_lp:
-            description.mqttTopic = (
+            description.mqttTopicCurrentValue = (
                 f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
             )
-            _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
+            _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
             sensorList.append(
                 openwbSensor(
                     uniqueID=integrationUniqueID,
@@ -110,6 +112,11 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
         def message_received(message):
             """Handle new MQTT messages."""
             self._attr_native_value = message.payload
+            
+            # Convert data if a conversion function is defined
+            if self.entity_description.value_fn is not None:
+                self._attr_native_value = self.entity_description.value_fn(self._attr_native_value)
+            
             # Map values as defined in the value map dict.
             if self.entity_description.valueMap is not None:
                 try:
@@ -159,5 +166,5 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
 
         # Subscribe to MQTT topic and connect callack message
         await mqtt.async_subscribe(
-            self.hass, self.entity_description.mqttTopic, message_received, 1
+            self.hass, self.entity_description.mqttTopicCurrentValue, message_received, 1
         )

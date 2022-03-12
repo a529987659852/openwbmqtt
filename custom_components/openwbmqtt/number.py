@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from os import device_encoding, stat
 
 from homeassistant.components import mqtt
-from homeassistant.components.number import NumberEntity, NumberMode
+from homeassistant.components.number import NumberEntity, NumberMode, DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (DEVICE_DEFAULT_NAME, ELECTRIC_CURRENT_AMPERE,
                                  ENERGY_KILO_WATT_HOUR, ENTITY_CATEGORY_CONFIG,
@@ -18,10 +18,9 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util import slugify
 from sqlalchemy import desc
 
-from . import DOMAIN
 from .common import OpenWBBaseEntity
 # Import global values.
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, NUMBERS_PER_LP,
+from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, NUMBERS_PER_LP, NUMBERS_GLOBAL,
                     openWBNumberEntityDescription)
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,15 +36,26 @@ async def async_setup_entry(
 
     numberList = []
 
-    # TODO: Global Numbers
+    NUMBERS_GLOBAL_COPY = copy.deepcopy(NUMBERS_GLOBAL)
+    for description in NUMBERS_GLOBAL_COPY:
+        description.mqttTopicCommand = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCommand}"
+        description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCurrentValue}"
+
+        numberList.append(
+            openWBNumber(
+                unique_id=integrationUniqueID,
+                description=description,
+                device_friendly_name=integrationUniqueID,
+                mqtt_root=mqttRoot,
+                # state=description.min_value,
+            )
+        )
 
     for chargePoint in range(1, nChargePoints + 1):
         NUMBERS_PER_LP_COPY = copy.deepcopy(NUMBERS_PER_LP)
         for description in NUMBERS_PER_LP_COPY:
-            description.mqttTopicCommand = f"{mqttRoot}/config/set/sofort/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
-            description.mqttTopicCurrentValue = (
-                f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
-            )
+            description.mqttTopicCommand = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+            description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
 
             numberList.append(
                 openWBNumber(
@@ -55,7 +65,7 @@ async def async_setup_entry(
                     currentChargePoint=chargePoint,
                     device_friendly_name=integrationUniqueID,
                     mqtt_root=mqttRoot,
-                    state=description.min_value,
+                    # state=description.min_value,
                 )
             )
     async_add_entities(numberList)
@@ -69,12 +79,12 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
     def __init__(
         self,
         unique_id: str,
-        state: float,
         device_friendly_name: str,
         mqtt_root: str,
         description: openWBNumberEntityDescription,
-        currentChargePoint: int | None = 1,
-        nChargePoints: int | None = 1,
+        state: float | None = None,
+        currentChargePoint: int | None = None,
+        nChargePoints: int | None = None,
         min_value: float | None = None,
         max_value: float | None = None,
         step: float | None = None,
@@ -94,16 +104,18 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
                 f"{unique_id}-CP{currentChargePoint}-{description.name}"
             )
             self.entity_id = (
-                f"number.{unique_id}-CP{currentChargePoint}-{description.name}"
+                f"{DOMAIN}.{unique_id}-CP{currentChargePoint}-{description.name}"
             )
             self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{unique_id}-{description.name}")
-            self.entity_id = f"number.{unique_id}-{description.name}"
+            self.entity_id = f"{DOMAIN}.{unique_id}-{description.name}"
             self._attr_name = description.name
 
-        self._attr_value = state
-        self._attr_mode = mode
+        if state is not None:
+            self._attr_value = state
+        
+            self._attr_mode = mode
 
         if min_value is not None:
             self._attr_min_value = min_value

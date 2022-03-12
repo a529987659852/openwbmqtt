@@ -5,7 +5,7 @@ import copy
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.binary_sensor import BinarySensorEntity, DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
@@ -34,10 +34,10 @@ async def async_setup_entry(
     for chargePoint in range(1, nChargePoints + 1):
         local_sensors_per_lp = copy.deepcopy(BINARY_SENSORS_PER_LP)
         for description in local_sensors_per_lp:
-            description.mqttTopic = (
+            description.mqttTopicCurrentValue = (
                 f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
             )
-            _LOGGER.debug("mqttTopic: %s", description.mqttTopic)
+            _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
             sensorList.append(
                 openwbBinarySensor(
                     uniqueID=integrationUniqueID,
@@ -80,12 +80,12 @@ class openwbBinarySensor(OpenWBBaseEntity, BinarySensorEntity):
                 f"{uniqueID}-CP{currentChargePoint}-{description.name}"
             )
             self.entity_id = (
-                f"binary_sensor.{uniqueID}-CP{currentChargePoint}-{description.name}"
+                f"{DOMAIN}.{uniqueID}-CP{currentChargePoint}-{description.name}"
             )
             self._attr_name = f"{description.name} (LP{currentChargePoint})"
         else:
             self._attr_unique_id = slugify(f"{uniqueID}-{description.name}")
-            self.entity_id = f"binary_sensor.{uniqueID}-{description.name}"
+            self.entity_id = f"{DOMAIN}.{uniqueID}-{description.name}"
             self._attr_name = description.name
 
     async def async_added_to_hass(self):
@@ -100,5 +100,5 @@ class openwbBinarySensor(OpenWBBaseEntity, BinarySensorEntity):
             self.async_write_ha_state()
 
         await mqtt.async_subscribe(
-            self.hass, self.entity_description.mqttTopic, message_received, 1
+            self.hass, self.entity_description.mqttTopicCurrentValue, message_received, 1
         )
