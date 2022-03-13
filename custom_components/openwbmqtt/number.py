@@ -1,38 +1,27 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from os import device_encoding, stat
-
-from sqlalchemy import desc
 
 from homeassistant.components import mqtt
 from homeassistant.components.number import DOMAIN, NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    DEVICE_DEFAULT_NAME,
-    ELECTRIC_CURRENT_AMPERE,
-    ENERGY_KILO_WATT_HOUR,
-    ENTITY_CATEGORY_CONFIG,
-    PERCENTAGE,
-)
+from homeassistant.const import (DEVICE_DEFAULT_NAME, ELECTRIC_CURRENT_AMPERE,
+                                 ENERGY_KILO_WATT_HOUR, ENTITY_CATEGORY_CONFIG,
+                                 PERCENTAGE)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util import slugify
+from sqlalchemy import desc
 
 from .common import OpenWBBaseEntity
-
 # Import global values.
-from .const import (
-    CHARGE_POINTS,
-    MQTT_ROOT_TOPIC,
-    NUMBERS_GLOBAL,
-    NUMBERS_PER_LP,
-    openWBNumberEntityDescription,
-)
+from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, NUMBERS_GLOBAL,
+                    NUMBERS_PER_LP, openWBNumberEntityDescription)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -125,8 +114,10 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
 
         if state is not None:
             self._attr_value = state
-        
-            self._attr_mode = mode
+        else:
+            self._attr_value = None
+
+        self._attr_mode = mode
 
         if min_value is not None:
             self._attr_min_value = min_value

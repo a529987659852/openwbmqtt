@@ -13,14 +13,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
-
 # Import global values.
-from .const import (
-    BINARY_SENSORS_PER_LP,
-    CHARGE_POINTS,
-    MQTT_ROOT_TOPIC,
-    openwbBinarySensorEntityDescription,
-)
+from .const import (BINARY_SENSORS_PER_LP, CHARGE_POINTS, MQTT_ROOT_TOPIC,
+                    openwbBinarySensorEntityDescription)
 
 _LOGGER = logging.getLogger(__name__)
 

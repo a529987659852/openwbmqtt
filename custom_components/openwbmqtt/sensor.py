@@ -2,28 +2,23 @@
 from __future__ import annotations
 
 import copy
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import async_get as async_get_dev_reg
+from homeassistant.helpers.device_registry import \
+    async_get as async_get_dev_reg
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt, slugify
 
 from .common import OpenWBBaseEntity
-
 # Import global values.
-from .const import (
-    CHARGE_POINTS,
-    MQTT_ROOT_TOPIC,
-    SENSORS_GLOBAL,
-    SENSORS_PER_LP,
-    openwbSensorEntityDescription,
-)
+from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SENSORS_GLOBAL,
+                    SENSORS_PER_LP, openwbSensorEntityDescription)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -164,6 +159,18 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     device.id, sw_version=message.payload
                 )
                 device_registry._update_device
+
+            # Update icon of countPhasesInUse
+            elif "countPhasesInUse" in self.entity_description.key:
+                if int(message.payload) == 0:
+                    self._attr_icon = "mdi:numeric-0-circle-outline"
+                elif int(message.payload) == 1:
+                    self._attr_icon = "mdi:numeric-1-circle-outline"
+                elif int(message.payload) == 3:
+                    self._attr_icon = "mdi:numeric-3-circle-outline"
+                else:
+                    self._attr_icon = "mdi:numeric"
+
 
             # Update entity state with value published on MQTT.
             self.async_write_ha_state()
