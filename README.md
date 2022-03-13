@@ -23,9 +23,29 @@ The integration subscribes to MQTT topics `prefix/<various values>` which are us
 
 The first parameter, **mqttroot**, defines the prefix that shall be applied to all MQTT topics. By default, openWB publishes data to the MQTT topic `openWB/#` (for example `openWB/lp/1/%Soc`). In this case, set the prefix to openWB and the integration will subscribe to MQTT data coming from openWB, for example `openWB/lp/1/%Soc`, or `openWB/global/chargeMode`, and so on.
   
+The second parameter, **chargepoints**, is the number of configured charge points. For each charge point, the integration will set up one set of sensors.
+
+# Mosquitto configuration in an internal network
+
+If you're in an internal network, for example your home network, you can simply subscribe the openWB mosquitto server with the mosquitto server you're using with home assistant. No bridge is required. Instead, add the following to the configuration (for example in /etc/mosquitto/conf.d/openwb.conf):
+
+```
+#
+# bridge to openWB Wallbox
+#
+connection openwb
+address openwb.fritz.box:1883
+start_type automatic
+topic openWB/# both 2
+local_clientid openwb.mosquitto
+try_private false
+cleansession true
+```
+If using this integration, **mqttroot** is openWB (this is the default value). Don't add a '/'.
+
 If your're publishing the data from the openWB mosquitto server to another MQTT server via a bridge, the topics on the other MQTT server are usually prepended with a prefix. If this is the case, also include this prefix into the first configuration parameter, for example `somePrefix/openWB`. Then, the integration coding will subscribe to MQTT data comfing from MQTT, for example `somePrefix/openWB/global/chargeMode`, or `somePrefix/openWB/lp/1/%Soc`, and so on.
 
-The second parameter, **chargepoints**, is the number of configured charge points. For each charge point, the integration will set up one set of sensors.
+# Services (deprecated)
 
 In addition, the integration also provides 4 services:
 - Enable / disable a charge point
@@ -33,11 +53,13 @@ In addition, the integration also provides 4 services:
 - Change charge limitation (not limited / kWh / %SoC) per charge point incl. target values
 - Change charge current per CP
 
+As of version 0.2, the services were replaced by selects, numbers, and switch sensors. Please use them instead.
+
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
 
 # Homeassistant configuration
 
-## Adding buttons to change charge mode
+## Adding buttons to change charge mode via service (deprecated --> use selects, numbers, and switches instead)
 
 If you want to be able to change the charge mode from within lovelace it's easiest to create a script like this:
 
