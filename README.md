@@ -1,4 +1,7 @@
 # openwbmqtt
+
+Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
+
 Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles. The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information and displays this informations as sensor entities.
 In addition, the integration provides services that execute actions on the openwb (for example enable/disable a charge point).
 
@@ -45,19 +48,17 @@ If using this integration, **mqttroot** is openWB (this is the default value). D
 
 If your're publishing the data from the openWB mosquitto server to another MQTT server via a bridge, the topics on the other MQTT server are usually prepended with a prefix. If this is the case, also include this prefix into the first configuration parameter, for example `somePrefix/openWB`. Then, the integration coding will subscribe to MQTT data comfing from MQTT, for example `somePrefix/openWB/global/chargeMode`, or `somePrefix/openWB/lp/1/%Soc`, and so on.
 
-# Services (deprecated)
+# Homeassistant configuration
 
-In addition, the integration also provides 4 services:
+## Services (deprecated)
+
+The integration also provides 4 services:
 - Enable / disable a charge point
 - Change the global charge mode of openWB (Sofortladen, Min+PV-Laden, Nur PV-Laden, Stop, Standby)
 - Change charge limitation (not limited / kWh / %SoC) per charge point incl. target values
 - Change charge current per CP
 
 As of version 0.2, the services were replaced by selects, numbers, and switch sensors. Please use them instead.
-
-Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
-
-# Homeassistant configuration
 
 ## Adding buttons to change charge mode via service (deprecated --> use selects, numbers, and switches instead)
 
