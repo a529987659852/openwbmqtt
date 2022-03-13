@@ -147,6 +147,42 @@ SENSORS_GLOBAL = [
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
+# Housebattery
+    openwbSensorEntityDescription(
+        key="housebattery/WhImported",
+        name="Batteriebezug",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x) / 1000.0, 1)
+    ),
+    openwbSensorEntityDescription(
+        key="housebattery/WhExported",
+        name="Batterieeinspeisung",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x) / 1000.0, 1)
+    ),
+    openwbSensorEntityDescription(
+        key="housebattery/W",
+        name="Batterieleistung",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=POWER_WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x))
+    ),
+    openwbSensorEntityDescription(
+        key="housebattery/%Soc",
+        name="SoC (Batterie)",
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+    ),
 ]
 
 SENSORS_PER_LP = [
