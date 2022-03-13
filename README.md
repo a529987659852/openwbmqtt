@@ -25,7 +25,7 @@ The first parameter, **mqttroot**, defines the prefix that shall be applied to a
   
 The second parameter, **chargepoints**, is the number of configured charge points. For each charge point, the integration will set up one set of sensors.
 
-# Mosquitto configuration in an internal network
+# Mosquitto Configuration in an Internal Network
 
 If you're in an internal network, for example your home network, you can simply subscribe the openWB mosquitto server with the mosquitto server you're using with home assistant. No bridge is required. Instead, add the following to the configuration (for example in /etc/mosquitto/conf.d/openwb.conf):
 
