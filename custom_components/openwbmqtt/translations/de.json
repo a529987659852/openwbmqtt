@@ -7,8 +7,7 @@
             "user": {
                 "data": {
                     "mqttroot": "MQTT-Wurzeltopic",
-                    "chargepoints": "Anzahl der Ladepunkte der openWB",
-                    "host": "IP-Adresse der openWB (nur Navigation zum openWB-UI)"
+                    "chargepoints": "Anzahl der Ladepunkte der openWB"
                 },
                 "description": "Richte die openWB-Integration ein.",
                 "title": "openWB-Integration in Home Assistant mittels MQTT"

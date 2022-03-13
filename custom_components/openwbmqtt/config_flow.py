@@ -1,11 +1,7 @@
 """The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
 from __future__ import annotations
 
-from typing import Any
-
-from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlow
-from homeassistant.util import slugify
 
 # Import global values.
 from .const import DATA_SCHEMA, DOMAIN, MQTT_ROOT_TOPIC
