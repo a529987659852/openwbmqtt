@@ -44,7 +44,7 @@ local_clientid openwb.mosquitto
 try_private false
 cleansession true
 ```
-If using this integration, **mqttroot** is openWB (this is the default value). Don't add a '/'.
+If using this integration, **mqttroot** is `openWB` (this is the default value). Don't add a '/'.
 
 If your're publishing the data from the openWB mosquitto server to another MQTT server via a bridge, the topics on the other MQTT server are usually prepended with a prefix. If this is the case, also include this prefix into the first configuration parameter, for example `somePrefix/openWB`. Then, the integration coding will subscribe to MQTT data comfing from MQTT, for example `somePrefix/openWB/global/chargeMode`, or `somePrefix/openWB/lp/1/%Soc`, and so on.
 
