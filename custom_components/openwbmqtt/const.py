@@ -17,10 +17,9 @@ from homeassistant.components.switch import (DEVICE_CLASS_SWITCH,
                                              SwitchEntityDescription)
 from homeassistant.const import (ELECTRIC_CURRENT_AMPERE,
                                  ELECTRIC_POTENTIAL_VOLT,
-                                 ENERGY_KILO_WATT_HOUR, ENERGY_WATT_HOUR,
-                                 ENTITY_CATEGORY_CONFIG,
-                                 ENTITY_CATEGORY_DIAGNOSTIC, LENGTH_KILOMETERS,
+                                 ENERGY_KILO_WATT_HOUR, LENGTH_KILOMETERS,
                                  PERCENTAGE, POWER_WATT, Platform)
+from homeassistant.helpers.entity import EntityCategory
 
 PLATFORMS = [Platform.SELECT, 
     Platform.SENSOR, 
@@ -91,7 +90,7 @@ SENSORS_GLOBAL = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         icon='mdi:earth',
     ),
     openwbSensorEntityDescription(
@@ -100,7 +99,7 @@ SENSORS_GLOBAL = [
         device_class=None,
         native_unit_of_measurement=None,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         icon='mdi:folder-clock',
     ),
     openwbSensorEntityDescription(
@@ -199,7 +198,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -282,7 +281,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=None,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:form-textbox",
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -291,7 +290,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=None,
         state_class=PERCENTAGE,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -300,7 +299,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=None,
         state_class=PERCENTAGE,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -309,7 +308,7 @@ SENSORS_PER_LP = [
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=None,
         state_class=PERCENTAGE,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -374,14 +373,14 @@ BINARY_SENSORS_PER_LP = [
         key="boolDirectModeChargekWh",
         name="Begrenzung Energie (Modus Sofortladen)",
         device_class=None,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:battery-charging",
     ),
     openwbBinarySensorEntityDescription(
         key="boolDirectChargeModeSoc",
         name="Begrenzung SoC (Modus Sofortladen)",
         device_class=None,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:battery-unknown",
     ),
     openwbBinarySensorEntityDescription(
@@ -389,7 +388,7 @@ BINARY_SENSORS_PER_LP = [
         name="Nachtladen aktiv",
         device_class=None,
         icon="mdi:weather-night",
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbBinarySensorEntityDescription(
@@ -407,7 +406,7 @@ BINARY_SENSORS_PER_LP = [
 SELECTS_GLOBAL = [
     openwbSelectEntityDescription( 
         key="global/ChargeMode",
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         name="Lademodus",
         valueMapCurrentValue={
             0: "Sofortladen",
@@ -438,7 +437,7 @@ SELECTS_GLOBAL = [
 SELECTS_PER_LP = [
      openwbSelectEntityDescription(
         key="chargeLimitation",
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         name="Ladebegrenzung (Modus Sofortladen)",
         valueMapCurrentValue={
             0: "Keine",
@@ -463,7 +462,7 @@ SELECTS_PER_LP = [
 SWITCHES_PER_LP = [
     openwbSwitchEntityDescription(
         key="ChargePointEnabled",
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         name = "Ladepunkt aktiv",
         mqttTopicCommand="ChargePointEnabled",
         mqttTopicCurrentValue="ChargePointEnabled",
@@ -481,7 +480,7 @@ NUMBERS_GLOBAL = [
         min_value=6.0,
         max_value=16.0,
         step=1.0,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         # icon=
         mqttTopicCommand="minCurrentMinPv",
         mqttTopicCurrentValue="minCurrentMinPv",
@@ -499,7 +498,7 @@ NUMBERS_PER_LP = [
         min_value=6.0,
         max_value=16.0,
         step=1.0,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         # icon=
         mqttTopicCommand="current",
         mqttTopicCurrentValue="current",
@@ -514,7 +513,7 @@ NUMBERS_PER_LP = [
         min_value=2.0,
         max_value=100.0,
         step=2.0,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         icon="mdi:battery-charging",
         mqttTopicCommand="energyToCharge",
         mqttTopicCurrentValue="energyToCharge",
@@ -529,7 +528,7 @@ NUMBERS_PER_LP = [
         min_value=5.0,
         max_value=100.0,
         step=5.0,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         # icon=
         mqttTopicCommand="socToChargeTo",
         mqttTopicCurrentValue="socToChargeTo",
@@ -544,7 +543,7 @@ NUMBERS_PER_LP = [
         min_value=0.0,
         max_value=100.0,
         step=1.0,
-        entity_category=ENTITY_CATEGORY_CONFIG,
+        entity_category=EntityCategory.CONFIG,
         mqttTopicCommand="manualSoc",
         mqttTopicCurrentValue="manualSoc",
         mqttTopicChargeMode = None,
