@@ -63,7 +63,7 @@ async def async_setup_entry(
                     description=description,
                     nChargePoints=int(nChargePoints),
                     currentChargePoint=chargePoint,
-                    device_friendly_name=integrationUniqueID,
+                    device_friendly_name=f"{integrationUniqueID}-LP{chargePoint}",
                     mqtt_root=mqttRoot,
                     # state=description.min_value,
                 )
