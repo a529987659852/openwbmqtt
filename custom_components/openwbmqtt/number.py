@@ -54,8 +54,12 @@ async def async_setup_entry(
     for chargePoint in range(1, nChargePoints + 1):
         NUMBERS_PER_LP_COPY = copy.deepcopy(NUMBERS_PER_LP)
         for description in NUMBERS_PER_LP_COPY:
-            description.mqttTopicCommand = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
-            description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
+            if description.mqttTopicChargeMode:
+                description.mqttTopicCommand = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+                description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
+            else: # for manual SoC module
+                description.mqttTopicCommand = f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+                description.mqttTopicCurrentValue = f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
 
             numberList.append(
                 openWBNumber(
