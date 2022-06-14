@@ -255,7 +255,7 @@ SENSORS_PER_LP = [
         name="Geladene Energie (gesamt)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:counter",
         value_fn=lambda x: round(float(x), 1),
     ),
