@@ -89,7 +89,7 @@ SENSORS_GLOBAL = [
         name="IP-Adresse",
         device_class=None,
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        # state_class=SensorStateClass.MEASUREMENT, //the IP address doesn't need to have a state_class = measurement, since nothing will be measured
         entity_category=EntityCategory.DIAGNOSTIC,
         icon='mdi:earth',
     ),
@@ -98,7 +98,7 @@ SENSORS_GLOBAL = [
         name="Version",
         device_class=None,
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        # state_class=SensorStateClass.MEASUREMENT, //the Version doesn't need to have a state_class = measurement, since nothing will be measured
         entity_category=EntityCategory.DIAGNOSTIC,
         icon='mdi:folder-clock',
     ),
@@ -124,7 +124,8 @@ SENSORS_GLOBAL = [
         name="Netzbezug",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,  # the state_class of Wh/Imported should probably be total_increasing.
+        # also, the default value (if the sensor is not available should be "unavailable" instead of 0.0
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
@@ -133,7 +134,8 @@ SENSORS_GLOBAL = [
         name="Netzeinspeisung",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,   # the state_class of Wh/Exported should probably be total_increasing.
+        # also, the default value (if the sensor is not available should be "unavailable" instead of 0.0
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
@@ -142,7 +144,8 @@ SENSORS_GLOBAL = [
         name="PV-Gesamtertrag",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,   # the state_class of PV Counter should probably be total_increasing.
+        # also, the default value (if the sensor is not available should be "unavailable" instead of 0.0
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
@@ -152,7 +155,8 @@ SENSORS_GLOBAL = [
         name="Batteriebezug",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,   # the state_class of Battery Imported should probably be total_increasing.
+        # also, the default value (if the sensor is not available should be "unavailable" instead of 0.0
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
@@ -161,7 +165,8 @@ SENSORS_GLOBAL = [
         name="Batterieeinspeisung",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,   # the state_class of Battery Exported should probably be total_increasing.
+        # also, the default value (if the sensor is not available should be "unavailable" instead of 0.0
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1)
     ),
@@ -192,7 +197,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=POWER_WATT,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    openwbSensorEntityDescription(
+    openwbSensorEntityDescription(      # this sensor doesn't exist in openWB integration... ?
         key="energyConsumptionPer100km",
         name="Durchschnittsverbrauch (pro 100 km)",
         device_class=SensorDeviceClass.ENERGY,
@@ -213,7 +218,7 @@ SENSORS_PER_LP = [
         name="Geladene Entfernung",
         device_class=None,
         native_unit_of_measurement=LENGTH_KILOMETERS,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,  # should be total increasing, since it can't fall back to 0.0
         icon="mdi:map-marker-distance",
     ),
     openwbSensorEntityDescription(
@@ -264,22 +269,22 @@ SENSORS_PER_LP = [
         name="Aktive Phasen",
         device_class=None,
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        #  state_class=SensorStateClass.MEASUREMENT, // I don't think that we need the measurement value here ? Is this relevant for statistics?
     ),
     openwbSensorEntityDescription(
         key="TimeRemaining",
         name="Voraus. Ladeende",
         device_class=SensorDeviceClass.TIMESTAMP,
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        # state_class=SensorStateClass.MEASUREMENT,   // I don't think that this should be a measurement state_class since we don't need this for statistics calculation
         icon="mdi:alarm",
     ),
-    openwbSensorEntityDescription(
+    openwbSensorEntityDescription(      #This sensor doesn't exist in openWB integration... ?
         key="strChargePointName",
         name="Ladepunktsbezeichnung",
         device_class=None,
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        # state_class=SensorStateClass.MEASUREMENT, // Not a statistics relevant sensor, so no state_class required
         icon="mdi:form-textbox",
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
@@ -289,7 +294,7 @@ SENSORS_PER_LP = [
         name="Leistungsfaktor (Phase 1)",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=None,
-        state_class=PERCENTAGE,
+        # state_class=PERCENTAGE,   // State_Class percentage doesn't exist. Percentage would be the unit of measurement... ?!
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
@@ -298,7 +303,7 @@ SENSORS_PER_LP = [
         name="Leistungsfaktor (Phase 2)",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=None,
-        state_class=PERCENTAGE,
+        # state_class=PERCENTAGE,   // State_Class percentage doesn't exist. Percentage would be the unit of measurement... ?!
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
@@ -307,7 +312,7 @@ SENSORS_PER_LP = [
         name="Leistungsfaktor (Phase 3)",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=None,
-        state_class=PERCENTAGE,
+        # state_class=PERCENTAGE,   // State_Class percentage doesn't exist. Percentage would be the unit of measurement... ?!
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
