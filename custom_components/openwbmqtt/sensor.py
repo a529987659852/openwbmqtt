@@ -2,23 +2,28 @@
 from __future__ import annotations
 
 import copy
-import logging
 from datetime import timedelta
+import logging
 
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import \
-    async_get as async_get_dev_reg
+from homeassistant.helpers.device_registry import async_get as async_get_dev_reg
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt, slugify
 
 from .common import OpenWBBaseEntity
+
 # Import global values.
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SENSORS_GLOBAL,
-                    SENSORS_PER_LP, openwbSensorEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    SENSORS_GLOBAL,
+    SENSORS_PER_LP,
+    openwbSensorEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -111,11 +116,13 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
         def message_received(message):
             """Handle new MQTT messages."""
             self._attr_native_value = message.payload
-            
+
             # Convert data if a conversion function is defined
             if self.entity_description.value_fn is not None:
-                self._attr_native_value = self.entity_description.value_fn(self._attr_native_value)
-            
+                self._attr_native_value = self.entity_description.value_fn(
+                    self._attr_native_value
+                )
+
             # Map values as defined in the value map dict.
             if self.entity_description.valueMap is not None:
                 try:
@@ -171,11 +178,13 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 else:
                     self._attr_icon = "mdi:numeric"
 
-
             # Update entity state with value published on MQTT.
             self.async_write_ha_state()
 
         # Subscribe to MQTT topic and connect callack message
         await mqtt.async_subscribe(
-            self.hass, self.entity_description.mqttTopicCurrentValue, message_received, 1
+            self.hass,
+            self.entity_description.mqttTopicCurrentValue,
+            message_received,
+            1,
         )

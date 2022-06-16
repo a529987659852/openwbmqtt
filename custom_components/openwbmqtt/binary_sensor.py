@@ -13,9 +13,14 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
+
 # Import global values.
-from .const import (BINARY_SENSORS_PER_LP, CHARGE_POINTS, MQTT_ROOT_TOPIC,
-                    openwbBinarySensorEntityDescription)
+from .const import (
+    BINARY_SENSORS_PER_LP,
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    openwbBinarySensorEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -100,5 +105,8 @@ class openwbBinarySensor(OpenWBBaseEntity, BinarySensorEntity):
             self.async_write_ha_state()
 
         await mqtt.async_subscribe(
-            self.hass, self.entity_description.mqttTopicCurrentValue, message_received, 1
+            self.hass,
+            self.entity_description.mqttTopicCurrentValue,
+            message_received,
+            1,
         )

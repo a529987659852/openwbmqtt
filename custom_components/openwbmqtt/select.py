@@ -12,8 +12,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SELECTS_GLOBAL,
-                    SELECTS_PER_LP, openwbSelectEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    SELECTS_GLOBAL,
+    SELECTS_PER_LP,
+    openwbSelectEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,10 +52,7 @@ async def async_setup_entry(
         local_selects_per_lp = copy.deepcopy(SELECTS_PER_LP)
         for description in local_selects_per_lp:
             description.mqttTopicCommand = f"{mqttRoot}/config/set/sofort/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
-            if description.mqttTopicCurrentValue is not None:
-                description.mqttTopicCurrentValue = (
-                    f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
-                )
+            description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/sofort/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
             selectList.append(
                 openwbSelect(
                     unique_id=integrationUniqueID,
@@ -131,8 +133,12 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         self.publishToMQTT(option)
-        self._attr_current_option = option
-        self.async_write_ha_state()
+        """After select --> the result is published to MQTT. 
+        But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
+        Only then, openWB has changed the setting as well.
+        """
+        # self._attr_current_option = option
+        # self.async_write_ha_state()
 
     def publishToMQTT(self, commandValueToPublish):
         topic = f"{self.entity_description.mqttTopicCommand}"

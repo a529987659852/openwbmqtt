@@ -4,16 +4,19 @@ import copy
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.switch import (DOMAIN, SwitchDeviceClass,
-                                             SwitchEntity)
+from homeassistant.components.switch import DOMAIN, SwitchDeviceClass, SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, SWITCHES_PER_LP,
-                    openwbSwitchEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    SWITCHES_PER_LP,
+    openwbSwitchEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +42,7 @@ async def async_setup_entry(
                 f"{mqttRoot}/set/lp{str(chargePoint)}/{description.mqttTopicCommand}"
             )
             description.mqttTopicCurrentValue = (
-                f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
+                f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
             )
             switchList.append(
                 openwbSwitch(
@@ -95,14 +98,12 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
 
         @callback
         def message_received(message):
-            """if int(message.payload) == 1:
+            if int(message.payload) == 1:
                 self._attr_is_on = True
             elif int(message.payload) == 0:
                 self._attr_is_on = False
             else:
                 self._attr_is_on = None
-            """
-            self._attr_is_on = bool(int(message.payload))
 
             self.async_write_ha_state()
 
@@ -115,16 +116,24 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
         )
 
     def turn_on(self, **kwargs):
-        """Turn the switch on."""
+        """Turn the switch on.
+        After turn_on --> the result is published to MQTT.
+        But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
+        Only then, openWB has changed the setting as well.
+        """
         self._attr_is_on = True
         self.publishToMQTT()
-        self.schedule_update_ha_state()
+        # self.schedule_update_ha_state()
 
     def turn_off(self, **kwargs):
-        """Turn the device off."""
+        """Turn the device off.
+        After turn_off --> the result is published to MQTT.
+        But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
+        Only then, openWB has changed the setting as well.
+        """
         self._attr_is_on = False
         self.publishToMQTT()
-        self.schedule_update_ha_state()
+        # self.schedule_update_ha_state()
 
     def publishToMQTT(self):
         topic = f"{self.entity_description.mqttTopicCommand}"

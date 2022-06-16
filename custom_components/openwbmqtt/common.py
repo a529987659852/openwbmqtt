@@ -6,22 +6,21 @@ from .const import DOMAIN, MANUFACTURER, MODEL
 class OpenWBBaseEntity:
     """Openwallbox entity base class."""
 
-    def __init__(self,
+    def __init__(
+        self,
         device_friendly_name: str,
         mqtt_root: str,
-        ) -> None:
+    ) -> None:
         """Init device info class."""
         self.device_friendly_name = device_friendly_name
         self.mqtt_root = mqtt_root
-
 
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device information."""
         return DeviceInfo(
-           name= self.device_friendly_name,
-           identifiers= {(DOMAIN, self.device_friendly_name)},
-           manufacturer= MANUFACTURER,
-           model= MODEL,
+            name=self.device_friendly_name,
+            identifiers={(DOMAIN, self.device_friendly_name)},
+            manufacturer=MANUFACTURER,
+            model=MODEL,
         )
-        

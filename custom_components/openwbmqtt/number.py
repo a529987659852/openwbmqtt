@@ -1,27 +1,38 @@
 from __future__ import annotations
 
 import copy
-import logging
 from dataclasses import dataclass
+import logging
 from os import device_encoding, stat
+
+from sqlalchemy import desc
 
 from homeassistant.components import mqtt
 from homeassistant.components.number import DOMAIN, NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (DEVICE_DEFAULT_NAME, ELECTRIC_CURRENT_AMPERE,
-                                 ENERGY_KILO_WATT_HOUR, ENTITY_CATEGORY_CONFIG,
-                                 PERCENTAGE)
+from homeassistant.const import (
+    DEVICE_DEFAULT_NAME,
+    ELECTRIC_CURRENT_AMPERE,
+    ENERGY_KILO_WATT_HOUR,
+    ENTITY_CATEGORY_CONFIG,
+    PERCENTAGE,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util import slugify
-from sqlalchemy import desc
 
 from .common import OpenWBBaseEntity
+
 # Import global values.
-from .const import (CHARGE_POINTS, MQTT_ROOT_TOPIC, NUMBERS_GLOBAL,
-                    NUMBERS_PER_LP, openWBNumberEntityDescription)
+from .const import (
+    CHARGE_POINTS,
+    MQTT_ROOT_TOPIC,
+    NUMBERS_GLOBAL,
+    NUMBERS_PER_LP,
+    openWBNumberEntityDescription,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +49,7 @@ async def async_setup_entry(
 
     NUMBERS_GLOBAL_COPY = copy.deepcopy(NUMBERS_GLOBAL)
     for description in NUMBERS_GLOBAL_COPY:
-        description.mqttTopicCommand = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCommand}"
+        description.mqttTopicCommand = f"{mqttRoot}/config/set/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCommand}"
         description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCurrentValue}"
 
         numberList.append(
@@ -55,10 +66,10 @@ async def async_setup_entry(
         NUMBERS_PER_LP_COPY = copy.deepcopy(NUMBERS_PER_LP)
         for description in NUMBERS_PER_LP_COPY:
             if description.mqttTopicChargeMode:
-                description.mqttTopicCommand = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+                description.mqttTopicCommand = f"{mqttRoot}/config/set/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
                 description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
-            else: # for manual SoC module
-                description.mqttTopicCommand = f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+            else:  # for manual SoC module
+                description.mqttTopicCommand = f"{mqttRoot}/set/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
                 description.mqttTopicCurrentValue = f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
 
             numberList.append(
@@ -99,7 +110,6 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
             device_friendly_name=device_friendly_name,
             mqtt_root=mqtt_root,
         )
-        """Initialize the Demo Number entity."""
 
         self.entity_description = description
 
@@ -116,10 +126,10 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
             self.entity_id = f"{DOMAIN}.{unique_id}-{description.name}"
             self._attr_name = description.name
 
-        if state is not None:
-            self._attr_value = state
-        else:
-            self._attr_value = None
+        # if state is not None:
+        #     self._attr_value = state
+        # else:
+        self._attr_value = state
 
         self._attr_mode = mode
 
@@ -148,10 +158,14 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
         )
 
     async def async_set_value(self, value):
-        """Update the current value."""
+        """Update the current value.
+        After set_value --> the result is published to MQTT.
+        But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
+        Only then, openWB has changed the setting as well.
+        """
         self._attr_value = value
         self.publishToMQTT()
-        self.async_write_ha_state()
+        # self.async_write_ha_state()
 
     def publishToMQTT(self):
         topic = f"{self.entity_description.mqttTopicCommand}"
