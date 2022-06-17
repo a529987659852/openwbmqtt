@@ -56,7 +56,6 @@ DATA_SCHEMA = vol.Schema(
     }
 )
 
-
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
@@ -65,14 +64,12 @@ class openwbSensorEntityDescription(SensorEntityDescription):
     valueMap: dict | None = None
     mqttTopicCurrentValue: str | None = None
 
-
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
 
     state: Callable | None = None
     mqttTopicCurrentValue: str | None = None
-
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
@@ -84,14 +81,12 @@ class openwbSelectEntityDescription(SelectEntityDescription):
     mqttTopicCurrentValue: str | None = None
     modes: list | None = None
 
-
 @dataclass
 class openwbSwitchEntityDescription(SwitchEntityDescription):
     """Enhance the select entity description for openWB"""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
-
 
 @dataclass
 class openWBNumberEntityDescription(NumberEntityDescription):
@@ -100,7 +95,6 @@ class openWBNumberEntityDescription(NumberEntityDescription):
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
     mqttTopicChargeMode: str | None = None
-
 
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
@@ -192,23 +186,7 @@ SENSORS_GLOBAL = [
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:harddisk",
     ),
-    openwbSensorEntityDescription(
-                               
-                          
-                          
-                                        
-                                                  
-                         
-      
-                                  
-                             
-                       
-                          
-                                        
-                                                  
-                                
-      
-                                  
+    openwbSensorEntityDescription(                       
         key="global/WHouseConsumption",
         name="Hausverbrauch",
         device_class=SensorDeviceClass.POWER,
