@@ -126,7 +126,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=POWER_WATT,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        icon="mdi:Home-Lightning-Bolt-Outline",
+        icon="mdi:home-lightning-bolt-outline",
     ),
     openwbSensorEntityDescription(
         key="pv/W",
@@ -136,7 +136,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) * (-1.0)),
-        icon="mdi:Solar-Power-Variant-Outline",
+        icon="mdi:solar-power-variant-outline",
     ),
     openwbSensorEntityDescription(
         key="evu/WhImported",
@@ -146,7 +146,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:Transmission-Tower-Import",
+        icon="mdi:transmission-tower-import",
     ),
     openwbSensorEntityDescription(
         key="evu/WhExported",
@@ -156,7 +156,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:Transmission-Tower-Export"
+        icon="mdi:transmission-tower-export"
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
@@ -166,7 +166,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:Counter",
+        icon="mdi:counter",
     ),
     # Housebattery
     openwbSensorEntityDescription(
@@ -177,7 +177,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:Battery-Arrow-Down-Outline",
+        icon="mdi:battery-arrow-down-outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/WhExported",
@@ -187,7 +187,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:Battery-Arrow-Up-Outline",
+        icon="mdi:battery-arrow-up-outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/W",
@@ -197,7 +197,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x)),
-        icon="mdi:Home-Battery-Outline",
+        icon="mdi:home-battery-outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/%Soc",
@@ -206,7 +206,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        icon="mdi:Battery-Charging-Low",
+        icon="mdi:battery-charging-low",
     ),
 ]
 
@@ -448,7 +448,13 @@ SELECTS_GLOBAL = [
         },
         mqttTopicCommand="set/ChargeMode",
         mqttTopicCurrentValue="global/ChargeMode",
-        modes=["Sofortladen", "Min+PV-Laden", "PV-Laden", "Stop", "Standby"],
+        modes=[
+            "Sofortladen",
+            "Min+PV-Laden",
+            "PV-Laden",
+            "Stop",
+            "Standby",
+        ],
     ),
 ]
 
