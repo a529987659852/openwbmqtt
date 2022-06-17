@@ -108,6 +108,7 @@ SENSORS_GLOBAL = [
         name="IP-Adresse",
         device_class=None,
         native_unit_of_measurement=None,
+        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:earth",
     ),
@@ -116,6 +117,7 @@ SENSORS_GLOBAL = [
         name="Version",
         device_class=None,
         native_unit_of_measurement=None,
+        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:folder-clock",
     ),
@@ -126,6 +128,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=POWER_WATT,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
+        icon="mdi:Home-Lightning-Bolt-Outline",
     ),
     openwbSensorEntityDescription(
         key="pv/W",
@@ -135,6 +138,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) * (-1.0)),
+        icon="mdi:Solar-Power-Variant-Outline",
     ),
     openwbSensorEntityDescription(
         key="evu/WhImported",
@@ -144,6 +148,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
+        icon="mdi:Transmission-Tower-Import",
     ),
     openwbSensorEntityDescription(
         key="evu/WhExported",
@@ -153,6 +158,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
+        icon="mdi:Transmission-Tower-Export"
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
@@ -162,6 +168,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
+        icon="mdi:Counter",
     ),
     # Housebattery
     openwbSensorEntityDescription(
@@ -172,6 +179,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
+        icon="mdi:Battery-Arrow-Down-Outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/WhExported",
@@ -181,6 +189,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
+        icon="mdi:Battery-Arrow-Up-Outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/W",
@@ -190,6 +199,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x)),
+        icon="mdi:Home-Battery-Outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/%Soc",
@@ -198,6 +208,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
+        icon="mdi:Battery-Charging-Low",
     ),
 ]
 
@@ -214,6 +225,7 @@ SENSORS_PER_LP = [
         name="Durchschnittsverbrauch (pro 100 km)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
@@ -442,8 +454,7 @@ SELECTS_GLOBAL = [
         modes=["Sofortladen", "Min+PV-Laden", "PV-Laden", "Stop", "Standby"],
     ),
 ]
-# prüfen, ob hier Änderungen im Topic notwendig sind...
-# set/lp1/DirectChargeSubMode => 0 = unbegrenzt, 1 = Energiemenge, 2 = EV-SoC
+
 SELECTS_PER_LP = [
     openwbSelectEntityDescription(
         key="chargeLimitation",
@@ -468,8 +479,6 @@ SELECTS_PER_LP = [
         ],
     ),
 ]
-# ggf. können / müssen auch weitere Einstell-Parameter hinzugefügt werden?
-# set/pv/priorityModeEVBattery => 0 = Haus-Akku, 1 = Auto; --> Kann auch abgefragt werden, wenn ein Hausspeicher vorhanden ist (?)
 
 SWITCHES_PER_LP = [
     openwbSwitchEntityDescription(
@@ -481,8 +490,6 @@ SWITCHES_PER_LP = [
         device_class=DEVICE_CLASS_SWITCH,
     ),
 ]
-
-
 
 NUMBERS_GLOBAL = [
     openWBNumberEntityDescription(
