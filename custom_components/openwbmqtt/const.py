@@ -55,7 +55,6 @@ DATA_SCHEMA = vol.Schema(
     }
 )
 
-
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
@@ -64,14 +63,12 @@ class openwbSensorEntityDescription(SensorEntityDescription):
     valueMap: dict | None = None
     mqttTopicCurrentValue: str | None = None
 
-
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
 
     state: Callable | None = None
     mqttTopicCurrentValue: str | None = None
-
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
@@ -83,14 +80,12 @@ class openwbSelectEntityDescription(SelectEntityDescription):
     mqttTopicCurrentValue: str | None = None
     modes: list | None = None
 
-
 @dataclass
 class openwbSwitchEntityDescription(SwitchEntityDescription):
     """Enhance the select entity description for openWB"""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
-
 
 @dataclass
 class openWBNumberEntityDescription(NumberEntityDescription):
@@ -99,7 +94,6 @@ class openWBNumberEntityDescription(NumberEntityDescription):
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
     mqttTopicChargeMode: str | None = None
-
 
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
@@ -140,7 +134,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:transmission-tower-export"
+        icon="mdi:transmission-tower-export",
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
@@ -238,7 +232,7 @@ SENSORS_GLOBAL = [
         key="global/cpuTemp",
         name="CPU Temperatur",
         device_class=None,
-        native_unit_of_measurement=CELSIUS,
+        native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:thermometer-alert",
     ),
@@ -246,7 +240,7 @@ SENSORS_GLOBAL = [
         key="global/memTotal",
         name="RAM Verfügbar",
         device_class=None,
-        native_unit_of_measurement=none,
+        native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:memory",
     ),
@@ -254,7 +248,7 @@ SENSORS_GLOBAL = [
         key="global/memUse",
         name="RAM Genutzt",
         device_class=None,
-        native_unit_of_measurement=none,
+        native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:memory",
     ),
@@ -262,7 +256,7 @@ SENSORS_GLOBAL = [
         key="global/memFree",
         name="RAM Frei",
         device_class=None,
-        native_unit_of_measurement=none,
+        native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:memory",
     ),
@@ -270,9 +264,9 @@ SENSORS_GLOBAL = [
         key="global/diskUse",
         name="Disk Verfügbar",
         device_class=None,
-        native_unit_of_measurement=none,
+        native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:harddisk ",
+        icon="mdi:harddisk",
     ),
     openwbSensorEntityDescription(
         key="global/diskFree",
@@ -280,7 +274,7 @@ SENSORS_GLOBAL = [
         device_class=None,
         native_unit_of_measurement=none,
         entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:harddisk ",
+        icon="mdi:harddisk",
     ),
 ]
 
