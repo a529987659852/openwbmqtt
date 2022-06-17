@@ -108,7 +108,6 @@ SENSORS_GLOBAL = [
         name="IP-Adresse",
         device_class=None,
         native_unit_of_measurement=None,
-        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:earth",
     ),
@@ -117,7 +116,6 @@ SENSORS_GLOBAL = [
         name="Version",
         device_class=None,
         native_unit_of_measurement=None,
-        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:folder-clock",
     ),
@@ -216,7 +214,6 @@ SENSORS_PER_LP = [
         name="Durchschnittsverbrauch (pro 100 km)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
@@ -298,7 +295,6 @@ SENSORS_PER_LP = [
         name="Ladepunktsbezeichnung",
         device_class=None,
         native_unit_of_measurement=None,
-        # state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:form-textbox",
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
@@ -446,7 +442,8 @@ SELECTS_GLOBAL = [
         modes=["Sofortladen", "Min+PV-Laden", "PV-Laden", "Stop", "Standby"],
     ),
 ]
-
+# prüfen, ob hier Änderungen im Topic notwendig sind...
+# set/lp1/DirectChargeSubMode => 0 = unbegrenzt, 1 = Energiemenge, 2 = EV-SoC
 SELECTS_PER_LP = [
     openwbSelectEntityDescription(
         key="chargeLimitation",
@@ -471,6 +468,8 @@ SELECTS_PER_LP = [
         ],
     ),
 ]
+# ggf. können / müssen auch weitere Einstell-Parameter hinzugefügt werden?
+# set/pv/priorityModeEVBattery => 0 = Haus-Akku, 1 = Auto; --> Kann auch abgefragt werden, wenn ein Hausspeicher vorhanden ist (?)
 
 SWITCHES_PER_LP = [
     openwbSwitchEntityDescription(
@@ -482,6 +481,8 @@ SWITCHES_PER_LP = [
         device_class=DEVICE_CLASS_SWITCH,
     ),
 ]
+
+
 
 NUMBERS_GLOBAL = [
     openWBNumberEntityDescription(
