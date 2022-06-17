@@ -55,7 +55,6 @@ DATA_SCHEMA = vol.Schema(
     }
 )
 
-
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
@@ -64,14 +63,12 @@ class openwbSensorEntityDescription(SensorEntityDescription):
     valueMap: dict | None = None
     mqttTopicCurrentValue: str | None = None
 
-
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
 
     state: Callable | None = None
     mqttTopicCurrentValue: str | None = None
-
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
@@ -83,14 +80,12 @@ class openwbSelectEntityDescription(SelectEntityDescription):
     mqttTopicCurrentValue: str | None = None
     modes: list | None = None
 
-
 @dataclass
 class openwbSwitchEntityDescription(SwitchEntityDescription):
     """Enhance the select entity description for openWB"""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
-
 
 @dataclass
 class openWBNumberEntityDescription(NumberEntityDescription):
@@ -99,7 +94,6 @@ class openWBNumberEntityDescription(NumberEntityDescription):
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
     mqttTopicChargeMode: str | None = None
-
 
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
@@ -120,6 +114,78 @@ SENSORS_GLOBAL = [
         icon="mdi:folder-clock",
     ),
     openwbSensorEntityDescription(
+        key="system/Uptime",
+        name="Uptime",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="md:web-clock",
+    ),
+    openwbSensorEntityDescription(
+        key="global/cpuModel",
+        name="CPU Modell",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:cpu-32-bit",
+    ),
+    openwbSensorEntityDescription(
+        key="global/cpuUse",
+        name="CPU Nutzung",
+        device_class=None,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:cpu-32-bit",
+    ),
+    openwbSensorEntityDescription(
+        key="global/cpuTemp",
+        name="CPU Temperatur",
+        device_class=None,
+        native_unit_of_measurement="°C",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:thermometer-alert",
+    ),
+    openwbSensorEntityDescription(
+        key="global/memTotal",
+        name="RAM Verfügbar",
+        device_class=None,
+        native_unit_of_measurement="MB",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:memory",
+    ),
+    openwbSensorEntityDescription(
+        key="global/memUse",
+        name="RAM Genutzt",
+        device_class=None,
+        native_unit_of_measurement="MB",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:memory",
+    ),
+    openwbSensorEntityDescription(
+        key="global/memFree",
+        name="RAM Frei",
+        device_class=None,
+        native_unit_of_measurement="MB",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:memory",
+    ),
+    openwbSensorEntityDescription(
+        key="global/diskUse",
+        name="Disk Verfügbar",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:harddisk",
+    ),
+    openwbSensorEntityDescription(
+        key="global/diskFree",
+        name="Disk Frei",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:harddisk",
+    ),
+    openwbSensorEntityDescription(                       
         key="global/WHouseConsumption",
         name="Hausverbrauch",
         device_class=SensorDeviceClass.POWER,
@@ -156,7 +222,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:transmission-tower-export"
+        icon="mdi:transmission-tower-export",
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
