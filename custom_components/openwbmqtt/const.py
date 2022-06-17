@@ -140,7 +140,7 @@ SENSORS_GLOBAL = [
     openwbSensorEntityDescription(
         key="global/cpuTemp",
         name="CPU Temperatur",
-        device_class=None,
+        device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement="°C",
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:thermometer-alert",
