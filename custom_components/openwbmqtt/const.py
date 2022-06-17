@@ -25,6 +25,7 @@ from homeassistant.const import (
     LENGTH_KILOMETERS,
     PERCENTAGE,
     POWER_WATT,
+    ATTR_TEMPERATURE,
     Platform,
 )
 import homeassistant.helpers.config_validation as cv
@@ -232,7 +233,7 @@ SENSORS_GLOBAL = [
         key="global/cpuTemp",
         name="CPU Temperatur",
         device_class=None,
-        native_unit_of_measurement=None,
+        native_unit_of_measurement=ATTR_TEMPERATURE,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:thermometer-alert",
     ),
