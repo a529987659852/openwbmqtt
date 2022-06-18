@@ -119,7 +119,7 @@ SENSORS_GLOBAL = [
         device_class=None,
         native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
-        icon="md:web-clock",
+        icon="mdi:web-clock",
     ),
     openwbSensorEntityDescription(
         key="global/cpuModel",
