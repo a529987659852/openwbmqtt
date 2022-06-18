@@ -377,8 +377,8 @@ SENSORS_PER_LP = [
     openwbSensorEntityDescription(
         key="PfPhase1",
         name="Leistungsfaktor (Phase 1)",
-        device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement=None,
+        device_class=None,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
@@ -386,8 +386,8 @@ SENSORS_PER_LP = [
     openwbSensorEntityDescription(
         key="PfPhase2",
         name="Leistungsfaktor (Phase 2)",
-        device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement=None,
+        device_class=None,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
@@ -395,8 +395,8 @@ SENSORS_PER_LP = [
     openwbSensorEntityDescription(
         key="PfPhase3",
         name="Leistungsfaktor (Phase 3)",
-        device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement=None,
+        device_class=None,
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
