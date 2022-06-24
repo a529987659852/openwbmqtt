@@ -148,9 +148,11 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     
             # Reformat uptime sensor
             if "uptime" in self.entity_id:
-                days = self._attr_native_value[12:].split(',')[0]
-                hours = self._attr_native_value[12:].split(',')[1]
-                self._attr_native_value = days + hours
+                days = self._attr_native_value[12:].split(',')[0][:-4]
+                hourmins = self._attr_native_value[12:].split(',')[1]
+                hours = hourmins[1:].split(":")[0]
+                mins = hourmins[2:].split(":")[1]
+                self._attr_native_value = days + "d " + hours + "h " + mins + "min"
                 
             # If MQTT message contains IP --> set up configuration_url to visit the device
             elif "ip_adresse" in self.entity_id:
