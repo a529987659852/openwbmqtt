@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 from datetime import timedelta
 import logging
+import re
 
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity
@@ -145,15 +146,23 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     self._attr_native_value = now + delta
                 else:
                     self._attr_native_value = None
-                    
+
             # Reformat uptime sensor
             if "uptime" in self.entity_id:
-                days = self._attr_native_value[12:].split(',')[0][:-5]
-                hourmins = self._attr_native_value[12:].split(',')[1]
-                hours = hourmins[1:].split(":")[0]
-                mins = hourmins[2:].split(":")[1]
-                self._attr_native_value = days + " d " + hours + " h " + mins + " min"
-                
+                reluptime = re.match(
+                    ".*\sup\s(.*),.*\d*user.*", self._attr_native_value
+                )[1]
+                days = 0
+                if re.match("(\d*)\sday.*", reluptime):
+                    days = re.match("(\d*)\sday", reluptime)[1]
+                    reluptime = re.match(".*,\s(.*)", reluptime)[1]
+                if re.match(".*min", reluptime):
+                    hours = 0
+                    mins = re.match("(\d*)\s*min", reluptime)[1]
+                else:
+                    hours, mins = re.match("\s?(\d*):0?(\d*)", reluptime).group(1, 2)
+                self._attr_native_value = f"{days} d {hours} h {mins} min"
+
             # If MQTT message contains IP --> set up configuration_url to visit the device
             elif "ip_adresse" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
