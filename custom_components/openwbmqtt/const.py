@@ -231,7 +231,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x) / 1000.0, 1),
+        value_fn=lambda x: round(float(x), 2),
         icon="mdi:transmission-tower-export",
     ),
     openwbSensorEntityDescription(
@@ -287,7 +287,7 @@ SENSORS_GLOBAL = [
     ),
     openwbSensorEntityDescription(
         key="housebattery/DailyYieldImportKwh",
-        name="Batterieentladung Heute (kWh)",
+        name="Batterieladung Heute (kWh)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
