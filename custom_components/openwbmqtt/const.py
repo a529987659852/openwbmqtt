@@ -226,7 +226,7 @@ SENSORS_GLOBAL = [
     ),
     openwbSensorEntityDescription(
         key="evu/DailyYieldExportKwh",
-        name="Heutiger Export (kWh)",
+        name="Heutiger Strom-Export (kWh)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
@@ -236,7 +236,7 @@ SENSORS_GLOBAL = [
     ),
     openwbSensorEntityDescription(
         key="evu/DailyYieldImportKwh",
-        name="Heutiger Bezug (kWh)",
+        name="Heutiger Strom-Bezug (kWh)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
@@ -283,7 +283,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x), 2),
-        icon="mdi:battery-tower-export",
+        icon="mdi:battery-arrow-up-outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/DailyYieldImportKwh",
