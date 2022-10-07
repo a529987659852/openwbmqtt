@@ -225,13 +225,33 @@ SENSORS_GLOBAL = [
         icon="mdi:transmission-tower-export",
     ),
     openwbSensorEntityDescription(
+        key="evu/DailyYieldExportKwh",
+        name="Heutiger Strom-Export (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:transmission-tower-export",
+    ),
+    openwbSensorEntityDescription(
+        key="evu/DailyYieldImportKwh",
+        name="Heutiger Strom-Bezug (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:transmission-tower-export",
+    ),
+    openwbSensorEntityDescription(
         key="pv/WhCounter",
         name="PV-Gesamtertrag",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x) / 1000.0, 1),
+        value_fn=lambda x: round(float(x), 2),
         icon="mdi:counter",
     ),
     # Housebattery
@@ -242,7 +262,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x) / 1000.0, 1),
+        value_fn=lambda x: round(float(x), 2),
         icon="mdi:battery-arrow-down-outline",
     ),
     openwbSensorEntityDescription(
@@ -252,8 +272,28 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x) / 1000.0, 1),
+        value_fn=lambda x: round(float(x), 2),
         icon="mdi:battery-arrow-up-outline",
+    ),
+    openwbSensorEntityDescription(
+        key="housebattery/DailyYieldExportKwh",
+        name="Batterieentladung Heute (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:battery-arrow-up-outline",
+    ),
+    openwbSensorEntityDescription(
+        key="housebattery/DailyYieldImportKwh",
+        name="Batterieladung Heute (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:battery-arrow-down-outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/W",
@@ -433,6 +473,17 @@ SENSORS_PER_LP = [
         name="Stromstärke (Phase 3)",
         device_class=SensorDeviceClass.CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+    ),
+]
+
+# add binarysensor system/updateinprogress
+BINARY_SENSORS_GLOBAL = [
+    openwbBinarySensorEntityDescription(
+        key="system/updateInProgress",
+        name="Update wird durchgeführt",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=None,
+        icon="mdi:update",
     ),
 ]
 

@@ -7,6 +7,6 @@
   "issue_tracker": "https://github.com/ChristophCaina/openwbmqtt/blob/13-add-monitoring-pc/custom_components/openwbmqtt/issues",
   "requirements": [],
   "iot_class": "local_polling",
-  "version": "0.4.1",
+  "version": "0.5",
   "config_flow": true
 }
