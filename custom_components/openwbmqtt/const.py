@@ -476,6 +476,17 @@ SENSORS_PER_LP = [
     ),
 ]
 
+# add binarysensor system/updateinprogress
+BINARY_SENSORS_GLOBAL = [
+    openwbBinarySensorEntityDescription(
+        key="system/updateInProgress",
+        name="Update wird durchgeführt",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=None,
+        icon="mdi:update",
+    ),
+]
+
 BINARY_SENSORS_PER_LP = [
     openwbBinarySensorEntityDescription(
         key="ChargeStatus",
