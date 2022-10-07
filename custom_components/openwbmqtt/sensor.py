@@ -173,7 +173,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     device.id,
                     configuration_url=f"http://{message.payload}/openWB/web/index.php",
                 )
-                device_registry._update_device
+                device_registry.async_update_device
             # If MQTT message contains version --> set sw_version of the device
             elif "version" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
@@ -183,7 +183,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 device_registry.async_update_device(
                     device.id, sw_version=message.payload
                 )
-                device_registry._update_device
+                device_registry.async_update_device
 
             # Update icon of countPhasesInUse
             elif "countPhasesInUse" in self.entity_description.key:
