@@ -4,7 +4,6 @@ from __future__ import annotations
 import copy
 from datetime import timedelta
 import logging
-import re
 
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity
@@ -146,23 +145,6 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     self._attr_native_value = now + delta
                 else:
                     self._attr_native_value = None
-
-            # Reformat uptime sensor
-            if "uptime" in self.entity_id:
-                reluptime = re.match(
-                    ".*\sup\s(.*),.*\d*user.*", self._attr_native_value
-                )[1]
-                days = 0
-                if re.match("(\d*)\sday.*", reluptime):
-                    days = re.match("(\d*)\sday", reluptime)[1]
-                    reluptime = re.match(".*,\s(.*)", reluptime)[1]
-                if re.match(".*min", reluptime):
-                    hours = 0
-                    mins = re.match("(\d*)\s*min", reluptime)[1]
-                else:
-                    hours, mins = re.match("\s?(\d*):0?(\d*)", reluptime).group(1, 2)
-                self._attr_native_value = f"{days} d {hours} h {mins} min"
-
             # If MQTT message contains IP --> set up configuration_url to visit the device
             elif "ip_adresse" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
@@ -173,7 +155,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     device.id,
                     configuration_url=f"http://{message.payload}/openWB/web/index.php",
                 )
-                device_registry.async_update_device
+                device_registry._update_device
             # If MQTT message contains version --> set sw_version of the device
             elif "version" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
@@ -183,7 +165,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 device_registry.async_update_device(
                     device.id, sw_version=message.payload
                 )
-                device_registry.async_update_device
+                device_registry._update_device
 
             # Update icon of countPhasesInUse
             elif "countPhasesInUse" in self.entity_description.key:

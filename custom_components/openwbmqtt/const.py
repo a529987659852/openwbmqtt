@@ -55,6 +55,7 @@ DATA_SCHEMA = vol.Schema(
     }
 )
 
+
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
@@ -63,12 +64,14 @@ class openwbSensorEntityDescription(SensorEntityDescription):
     valueMap: dict | None = None
     mqttTopicCurrentValue: str | None = None
 
+
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Enhance the sensor entity description for openWB"""
 
     state: Callable | None = None
     mqttTopicCurrentValue: str | None = None
+
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
@@ -80,12 +83,14 @@ class openwbSelectEntityDescription(SelectEntityDescription):
     mqttTopicCurrentValue: str | None = None
     modes: list | None = None
 
+
 @dataclass
 class openwbSwitchEntityDescription(SwitchEntityDescription):
     """Enhance the select entity description for openWB"""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
+
 
 @dataclass
 class openWBNumberEntityDescription(NumberEntityDescription):
@@ -95,6 +100,7 @@ class openWBNumberEntityDescription(NumberEntityDescription):
     mqttTopicCurrentValue: str | None = None
     mqttTopicChargeMode: str | None = None
 
+
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
     openwbSensorEntityDescription(
@@ -102,6 +108,7 @@ SENSORS_GLOBAL = [
         name="IP-Adresse",
         device_class=None,
         native_unit_of_measurement=None,
+        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:earth",
     ),
@@ -110,80 +117,9 @@ SENSORS_GLOBAL = [
         name="Version",
         device_class=None,
         native_unit_of_measurement=None,
+        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:folder-clock",
-    ),
-    openwbSensorEntityDescription(
-        key="system/Uptime",
-        name="Uptime",
-        device_class=None,
-        native_unit_of_measurement=None,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:web-clock",
-    ),
-    openwbSensorEntityDescription(
-        key="global/cpuModel",
-        name="CPU Modell",
-        device_class=None,
-        native_unit_of_measurement=None,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:cpu-32-bit",
-    ),
-    openwbSensorEntityDescription(
-        key="global/cpuUse",
-        name="CPU Nutzung",
-        device_class=None,
-        native_unit_of_measurement=PERCENTAGE,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:cpu-32-bit",
-    ),
-    openwbSensorEntityDescription(
-        key="global/cpuTemp",
-        name="CPU Temperatur",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        native_unit_of_measurement="°C",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:thermometer-alert",
-    ),
-    openwbSensorEntityDescription(
-        key="global/memTotal",
-        name="RAM Verfügbar",
-        device_class=None,
-        native_unit_of_measurement="MB",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:memory",
-    ),
-    openwbSensorEntityDescription(
-        key="global/memUse",
-        name="RAM Genutzt",
-        device_class=None,
-        native_unit_of_measurement="MB",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:memory",
-    ),
-    openwbSensorEntityDescription(
-        key="global/memFree",
-        name="RAM Frei",
-        device_class=None,
-        native_unit_of_measurement="MB",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:memory",
-    ),
-    openwbSensorEntityDescription(
-        key="global/diskUse",
-        name="Disk Verfügbar",
-        device_class=None,
-        native_unit_of_measurement=None,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:harddisk",
-    ),
-    openwbSensorEntityDescription(
-        key="global/diskFree",
-        name="Disk Frei",
-        device_class=None,
-        native_unit_of_measurement=None,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:harddisk",
     ),
     openwbSensorEntityDescription(
         key="global/WHouseConsumption",
@@ -192,7 +128,6 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=POWER_WATT,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        icon="mdi:home-lightning-bolt-outline",
     ),
     openwbSensorEntityDescription(
         key="pv/W",
@@ -202,7 +137,6 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) * (-1.0)),
-        icon="mdi:solar-power-variant-outline",
     ),
     openwbSensorEntityDescription(
         key="evu/WhImported",
@@ -212,7 +146,6 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:transmission-tower-import",
     ),
     openwbSensorEntityDescription(
         key="evu/WhExported",
@@ -222,27 +155,6 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 1),
-        icon="mdi:transmission-tower-export",
-    ),
-    openwbSensorEntityDescription(
-        key="evu/DailyYieldExportKwh",
-        name="Heutiger Strom-Export (kWh)",
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:transmission-tower-export",
-    ),
-    openwbSensorEntityDescription(
-        key="evu/DailyYieldImportKwh",
-        name="Heutiger Strom-Bezug (kWh)",
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:transmission-tower-export",
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
@@ -251,8 +163,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:counter",
+        value_fn=lambda x: round(float(x) / 1000.0, 1),
     ),
     # Housebattery
     openwbSensorEntityDescription(
@@ -262,8 +173,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:battery-arrow-down-outline",
+        value_fn=lambda x: round(float(x) / 1000.0, 1),
     ),
     openwbSensorEntityDescription(
         key="housebattery/WhExported",
@@ -272,28 +182,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:battery-arrow-up-outline",
-    ),
-    openwbSensorEntityDescription(
-        key="housebattery/DailyYieldExportKwh",
-        name="Batterieentladung Heute (kWh)",
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:battery-arrow-up-outline",
-    ),
-    openwbSensorEntityDescription(
-        key="housebattery/DailyYieldImportKwh",
-        name="Batterieladung Heute (kWh)",
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x), 2),
-        icon="mdi:battery-arrow-down-outline",
+        value_fn=lambda x: round(float(x) / 1000.0, 1),
     ),
     openwbSensorEntityDescription(
         key="housebattery/W",
@@ -303,7 +192,6 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x)),
-        icon="mdi:home-battery-outline",
     ),
     openwbSensorEntityDescription(
         key="housebattery/%Soc",
@@ -312,7 +200,6 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        icon="mdi:battery-charging-low",
     ),
 ]
 
@@ -329,6 +216,7 @@ SENSORS_PER_LP = [
         name="Durchschnittsverbrauch (pro 100 km)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        # state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
@@ -352,13 +240,14 @@ SENSORS_PER_LP = [
         name="SoC",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     openwbSensorEntityDescription(
         key="kWhActualCharged",
         name="Geladene Energie (akt. Ladevorgang)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:counter",
         value_fn=lambda x: round(float(x), 2),
     ),
@@ -367,7 +256,7 @@ SENSORS_PER_LP = [
         name="Geladene Energie (seit Anstecken)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:counter",
         value_fn=lambda x: round(float(x), 2),
     ),
@@ -376,7 +265,7 @@ SENSORS_PER_LP = [
         name="Geladene Energie (heute)",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:counter",
         value_fn=lambda x: round(float(x), 2),
     ),
@@ -394,12 +283,14 @@ SENSORS_PER_LP = [
         name="Aktive Phasen",
         device_class=None,
         native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     openwbSensorEntityDescription(
         key="TimeRemaining",
         name="Voraus. Ladeende",
         device_class=SensorDeviceClass.TIMESTAMP,
         native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:alarm",
     ),
     openwbSensorEntityDescription(
@@ -407,6 +298,7 @@ SENSORS_PER_LP = [
         name="Ladepunktsbezeichnung",
         device_class=None,
         native_unit_of_measurement=None,
+        # state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:form-textbox",
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
@@ -414,24 +306,27 @@ SENSORS_PER_LP = [
     openwbSensorEntityDescription(
         key="PfPhase1",
         name="Leistungsfaktor (Phase 1)",
-        device_class=None,
-        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
         key="PfPhase2",
         name="Leistungsfaktor (Phase 2)",
-        device_class=None,
-        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
         key="PfPhase3",
         name="Leistungsfaktor (Phase 3)",
-        device_class=None,
-        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
@@ -440,6 +335,7 @@ SENSORS_PER_LP = [
         name="Spannung (Phase 1)",
         device_class=SensorDeviceClass.VOLTAGE,
         native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -447,6 +343,7 @@ SENSORS_PER_LP = [
         name="Spannung (Phase 2)",
         device_class=SensorDeviceClass.VOLTAGE,
         native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -454,6 +351,7 @@ SENSORS_PER_LP = [
         name="Spannung (Phase 3)",
         device_class=SensorDeviceClass.VOLTAGE,
         native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
@@ -461,29 +359,21 @@ SENSORS_PER_LP = [
         name="Stromstärke (Phase 1)",
         device_class=SensorDeviceClass.CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     openwbSensorEntityDescription(
         key="APhase2",
         name="Stromstärke (Phase 2)",
         device_class=SensorDeviceClass.CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     openwbSensorEntityDescription(
         key="APhase3",
         name="Stromstärke (Phase 3)",
         device_class=SensorDeviceClass.CURRENT,
         native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
-    ),
-]
-
-# add binarysensor system/updateinprogress
-BINARY_SENSORS_GLOBAL = [
-    openwbBinarySensorEntityDescription(
-        key="system/updateInProgress",
-        name="Update wird durchgeführt",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=None,
-        icon="mdi:update",
+        state_class=SensorStateClass.MEASUREMENT,
     ),
 ]
 
@@ -553,13 +443,7 @@ SELECTS_GLOBAL = [
         },
         mqttTopicCommand="set/ChargeMode",
         mqttTopicCurrentValue="global/ChargeMode",
-        modes=[
-            "Sofortladen",
-            "Min+PV-Laden",
-            "PV-Laden",
-            "Stop",
-            "Standby",
-        ],
+        modes=["Sofortladen", "Min+PV-Laden", "PV-Laden", "Stop", "Standby"],
     ),
 ]
 
@@ -603,11 +487,11 @@ NUMBERS_GLOBAL = [
     openWBNumberEntityDescription(
         key="minCurrentMinPv",
         name="Mindestladestrom (Modus Min+PV-Laden)",
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         device_class="Power",
-        native_min_value=6.0,
-        native_max_value=16.0,
-        native_step=1.0,
+        min_value=6.0,
+        max_value=16.0,
+        step=1.0,
         entity_category=EntityCategory.CONFIG,
         # icon=
         mqttTopicCommand="minCurrentMinPv",
@@ -621,11 +505,11 @@ NUMBERS_PER_LP = [
     openWBNumberEntityDescription(
         key="current",
         name="Ladestromvorgabe (Modus Sofortladen)",
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
         device_class="Power",
-        native_min_value=6.0,
-        native_max_value=16.0,
-        native_step=1.0,
+        min_value=6.0,
+        max_value=16.0,
+        step=1.0,
         entity_category=EntityCategory.CONFIG,
         # icon=
         mqttTopicCommand="current",
@@ -636,11 +520,11 @@ NUMBERS_PER_LP = [
     openWBNumberEntityDescription(
         key="energyToCharge",
         name="Energiebegrenzung (Modus Sofortladen)",
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         device_class="Energy",
-        native_min_value=2.0,
-        native_max_value=100.0,
-        native_step=2.0,
+        min_value=2.0,
+        max_value=100.0,
+        step=2.0,
         entity_category=EntityCategory.CONFIG,
         icon="mdi:battery-charging",
         mqttTopicCommand="energyToCharge",
@@ -650,12 +534,12 @@ NUMBERS_PER_LP = [
     openWBNumberEntityDescription(
         key="socToChargeTo",
         name="SoC-Begrenzung (Modus Sofortladen)",
-        native_unit_of_measurement=PERCENTAGE,
+        unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.BATTERY,
         icon="mdi:battery-unknown",
-        native_min_value=5.0,
-        native_max_value=100.0,
-        native_step=5.0,
+        min_value=5.0,
+        max_value=100.0,
+        step=5.0,
         entity_category=EntityCategory.CONFIG,
         # icon=
         mqttTopicCommand="socToChargeTo",
@@ -665,12 +549,12 @@ NUMBERS_PER_LP = [
     openWBNumberEntityDescription(
         key="manualSoc",
         name="Aktueller SoC (Manuelles SoC Modul)",
-        native_unit_of_measurement=PERCENTAGE,
+        unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.BATTERY,
         icon="mdi:battery-unknown",
-        native_min_value=0.0,
-        native_max_value=100.0,
-        native_step=1.0,
+        min_value=0.0,
+        max_value=100.0,
+        step=1.0,
         entity_category=EntityCategory.CONFIG,
         mqttTopicCommand="manualSoc",
         mqttTopicCurrentValue="manualSoc",

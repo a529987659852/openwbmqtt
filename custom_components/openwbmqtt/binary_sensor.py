@@ -16,7 +16,6 @@ from .common import OpenWBBaseEntity
 
 # Import global values.
 from .const import (
-    BINARY_SENSORS_GLOBAL,
     BINARY_SENSORS_PER_LP,
     CHARGE_POINTS,
     MQTT_ROOT_TOPIC,
@@ -35,19 +34,7 @@ async def async_setup_entry(
     nChargePoints = config.data[CHARGE_POINTS]
 
     sensorList = []
-    # Create all global sensors.
-    global_sensors = copy.deepcopy(BINARY_SENSORS_GLOBAL)
-    for description in global_sensors:
-        description.mqttTopicCurrentValue = f"{mqttRoot}/{description.key}"
-        _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
-        sensorList.append(
-            openwbBinarySensor(
-                uniqueID=integrationUniqueID,
-                description=description,
-                device_friendly_name=integrationUniqueID,
-                mqtt_root=mqttRoot,
-            )
-        )
+
     # Create all sensors for each charge point, respectively.
     for chargePoint in range(1, nChargePoints + 1):
         local_sensors_per_lp = copy.deepcopy(BINARY_SENSORS_PER_LP)
