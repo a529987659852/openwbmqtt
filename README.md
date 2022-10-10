@@ -1,3 +1,5 @@
+This project has been forked from: https://github.com/a529987659852/openwbmqtt  
+if you want to use this component, you need to uninstall the original one first.  
 # openwbmqtt
 
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
@@ -49,45 +51,3 @@ cleansession true
 If using the mqtt configuration above, **mqttroot** is `openWB` (this is the default value). Don't add a '/'.
 
 If your're publishing the data from the openWB mosquitto server to another MQTT server via a bridge, the topics on the other MQTT server are usually prepended with a prefix. If this is the case, also include this prefix into the first configuration parameter, for example `somePrefix/openWB`. Then, the integration coding will subscribe to MQTT data comfing from MQTT, for example `somePrefix/openWB/global/chargeMode`, or `somePrefix/openWB/lp/1/%Soc`, and so on.
-
-# Homeassistant configuration
-
-## Services (deprecated)
-
-The integration also provides 4 services:
-- Enable / disable a charge point
-- Change the global charge mode of openWB (Sofortladen, Min+PV-Laden, Nur PV-Laden, Stop, Standby)
-- Change charge limitation (not limited / kWh / %SoC) per charge point incl. target values
-- Change charge current per CP
-
-As of version 0.2, the services were replaced by selects, numbers, and switch sensors. Please use them instead.
-
-## Adding buttons to change charge mode via service (deprecated --> use selects, numbers, and switches instead)
-
-If you want to be able to change the charge mode from within lovelace it's easiest to create a script like this:
-
-```
-openwb_mode:
-  alias: Set openWB Charging Mode
-  sequence:
-    - service: openwbmqtt.change_global_charge_mode
-      data:
-        global_charge_mode: '{{chargemode}}'
-        mqtt_prefix: openWB
-  mode: single
-```
-
-In lovelace you can then add an entity-button that will change the `charge_mode`:
-
-```
-type: entity-button
-name: Minpluspv
-show_state: false
-tap_action:
-  action: call-service
-  service: script.openwb_mode
-  service_data:
-    chargemode: Min+PV-Laden
-entity: script.openwb_mode
-```
-

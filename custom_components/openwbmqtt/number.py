@@ -100,9 +100,9 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
         state: float | None = None,
         currentChargePoint: int | None = None,
         nChargePoints: int | None = None,
-        min_value: float | None = None,
-        max_value: float | None = None,
-        step: float | None = None,
+        native_min_value: float | None = None,
+        native_max_value: float | None = None,
+        native_step: float | None = None,
         mode: NumberMode = NumberMode.AUTO,
     ) -> None:
         """Initialize the sensor and the openWB device."""
@@ -129,16 +129,16 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
         # if state is not None:
         #     self._attr_value = state
         # else:
-        self._attr_value = state
+        self._attr_native_value = state
 
         self._attr_mode = mode
 
-        if min_value is not None:
-            self._attr_min_value = min_value
-        if max_value is not None:
-            self._attr_max_value = max_value
-        if step is not None:
-            self._attr_step = step
+        if native_min_value is not None:
+            self._attr_native_min_value = native_min_value
+        if native_max_value is not None:
+            self._attr_native_max_value = native_max_value
+        if native_step is not None:
+            self._attr_native_step = native_step
 
     async def async_added_to_hass(self):
         """Subscribe to MQTT events."""
@@ -146,7 +146,7 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
         @callback
         def message_received(message):
             """Handle new MQTT messages."""
-            self._attr_value = float(message.payload)
+            self._attr_native_value = float(message.payload)
             self.async_write_ha_state()
 
         # Subscribe to MQTT topic and connect callack message
@@ -157,19 +157,19 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
             1,
         )
 
-    async def async_set_value(self, value):
+    async def async_set_native_value(self, value):
         """Update the current value.
         After set_value --> the result is published to MQTT.
         But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
         Only then, openWB has changed the setting as well.
         """
-        self._attr_value = value
+        self._attr_native_value = value
         self.publishToMQTT()
         # self.async_write_ha_state()
 
     def publishToMQTT(self):
         topic = f"{self.entity_description.mqttTopicCommand}"
         _LOGGER.debug("MQTT topic: %s", topic)
-        payload = str(int(self._attr_value))
+        payload = str(int(self._attr_native_value))
         _LOGGER.debug("MQTT payload: %s", payload)
         self.hass.components.mqtt.publish(self.hass, topic, payload)
