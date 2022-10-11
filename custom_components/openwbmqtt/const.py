@@ -122,13 +122,6 @@ SENSORS_GLOBAL = [
         icon="mdi:web-clock",
     ),
     openwbSensorEntityDescription(
-        key="system/lastRfId",
-        name="letzter RFID-Tag",
-        device_class=None,
-        native_unit_of_measurement=None,
-        icon="mdi:Tag-multiple-outline",
-    ),
-    openwbSensorEntityDescription(
         key="global/cpuModel",
         name="CPU Modell",
         device_class=None,
