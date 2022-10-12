@@ -1,7 +1,5 @@
 # openwbmqtt
 
-THIS is an fork based on the work of https://github.com/a529987659852/openwbmqtt! 
-
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
 
 Custom component for home assistant supporting [openWB wallbox](https://openwb.de/main/) wallbox for charging electric vehicles. The integration subscribes to MQTT topics `prefix/<various values>` which are used by openwb to broadcast information and displays this informations as sensor entities.
