@@ -242,7 +242,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x), 2),
-        icon="mdi:transmission-tower-export",
+        icon="mdi:transmission-tower-import",
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
