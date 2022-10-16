@@ -438,7 +438,7 @@ SENSORS_PER_LP = [
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:counter",
-        value_fn=lambda x: round(float(x), 1),
+        value_fn=lambda x: round(float(x), 2),
     ),
     openwbSensorEntityDescription(
         key="countPhasesInUse",
