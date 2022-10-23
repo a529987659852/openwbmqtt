@@ -231,6 +231,15 @@ SENSORS_GLOBAL = [
         icon="mdi:solar-power-variant-outline",
     ),
     openwbSensorEntityDescription(
+        key="evu/W",
+        name="EVU-Leistung",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=POWER_WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        icon="mdi:transmission-tower",
+    ),
+    openwbSensorEntityDescription(
         key="evu/WhImported",
         name="Netzbezug",
         device_class=SensorDeviceClass.ENERGY,
