@@ -206,6 +206,15 @@ SENSORS_GLOBAL = [
         icon="mdi:home-lightning-bolt-outline",
     ),
     openwbSensorEntityDescription(
+        key="global/DailyYieldHausverbrauchKwh",
+        name="Heutiger Hausverbrauch (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
         key="global/WAllChargePoints",
         name="Ladeleistung aller Ladepunkte",
         device_class=SensorDeviceClass.POWER,
