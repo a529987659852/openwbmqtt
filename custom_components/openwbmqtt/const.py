@@ -243,6 +243,15 @@ SENSORS_GLOBAL = [
         value_fn=lambda x: round(float(x) / 1000.0, 2),
         icon="mdi:counter",
     ),
+    openwbSensorEntityDescription(
+        key="pv/DailyYieldKwh",
+        name="Heutiger PV-Ertrag (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:counter",
+    ),
     # EVU
     openwbSensorEntityDescription(
         key="evu/W",
