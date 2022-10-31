@@ -97,6 +97,7 @@ class openWBNumberEntityDescription(NumberEntityDescription):
 
 # List of global sensors that are relevant to the entire wallbox
 SENSORS_GLOBAL = [
+    # System
     openwbSensorEntityDescription(
         key="system/IpAddress",
         name="IP-Adresse",
@@ -130,6 +131,7 @@ SENSORS_GLOBAL = [
         entity_registry_enabled_default=False,
         icon="mdi:tag-multiple-outline",
     ),
+    # Global
     openwbSensorEntityDescription(
         key="global/cpuModel",
         name="CPU Modell",
@@ -204,6 +206,15 @@ SENSORS_GLOBAL = [
         icon="mdi:home-lightning-bolt-outline",
     ),
     openwbSensorEntityDescription(
+        key="global/DailyYieldHausverbrauchKwh",
+        name="Heutiger Hausverbrauch (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
         key="global/WAllChargePoints",
         name="Ladeleistung aller Ladepunkte",
         device_class=SensorDeviceClass.POWER,
@@ -220,6 +231,7 @@ SENSORS_GLOBAL = [
         value_fn=lambda x: round(float(x), 2),
         icon="mdi:counter",
     ),
+    # PV
     openwbSensorEntityDescription(
         key="pv/W",
         name="PV-Leistung",
@@ -230,6 +242,26 @@ SENSORS_GLOBAL = [
         value_fn=lambda x: round(float(x) * (-1.0)),
         icon="mdi:solar-power-variant-outline",
     ),
+    openwbSensorEntityDescription(
+        key="pv/WhCounter",
+        name="PV-Gesamtertrag",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_registry_enabled_default=False,
+        value_fn=lambda x: round(float(x) / 1000.0, 2),
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="pv/DailyYieldKwh",
+        name="Heutiger PV-Ertrag (kWh)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda x: round(float(x), 2),
+        icon="mdi:counter",
+    ),
+    # EVU
     openwbSensorEntityDescription(
         key="evu/W",
         name="EVU-Leistung",
@@ -278,16 +310,6 @@ SENSORS_GLOBAL = [
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x), 2),
         icon="mdi:transmission-tower-import",
-    ),
-    openwbSensorEntityDescription(
-        key="pv/WhCounter",
-        name="PV-Gesamtertrag",
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        entity_registry_enabled_default=False,
-        value_fn=lambda x: round(float(x) / 1000.0, 2),
-        icon="mdi:counter",
     ),
     # Housebattery
     openwbSensorEntityDescription(
