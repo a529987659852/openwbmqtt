@@ -23,9 +23,9 @@ from homeassistant.const import (
     ELECTRIC_POTENTIAL_VOLT,
     PERCENTAGE,
     Platform,
+    UnitOfPower,
     UnitOfEnergy,
     UnitOfLength,
-    UnitOfPower,
 )
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import EntityCategory
