@@ -19,13 +19,13 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.components.switch import SwitchDeviceClass, SwitchEntityDescription
 from homeassistant.const import (
-    ELECTRIC_CURRENT_AMPERE,
-    ELECTRIC_POTENTIAL_VOLT,
     PERCENTAGE,
     Platform,
     UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
+    UnitOfElectricPotential,
+    UnitOfElectricCurrent,
 )
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import EntityCategory
@@ -434,7 +434,7 @@ SENSORS_PER_LP = [
         key="AConfigured",
         name="Ladestromvorgabe",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     openwbSensorEntityDescription(
@@ -537,40 +537,40 @@ SENSORS_PER_LP = [
         key="VPhase1",
         name="Spannung (Phase 1)",
         device_class=SensorDeviceClass.VOLTAGE,
-        native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
         key="VPhase2",
         name="Spannung (Phase 2)",
         device_class=SensorDeviceClass.VOLTAGE,
-        native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
         key="VPhase3",
         name="Spannung (Phase 3)",
         device_class=SensorDeviceClass.VOLTAGE,
-        native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         entity_registry_enabled_default=False,
     ),
     openwbSensorEntityDescription(
         key="APhase1",
         name="Stromstärke (Phase 1)",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
     ),
     openwbSensorEntityDescription(
         key="APhase2",
         name="Stromstärke (Phase 2)",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
     ),
     openwbSensorEntityDescription(
         key="APhase3",
         name="Stromstärke (Phase 3)",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
     ),
 ]
 
@@ -720,7 +720,7 @@ NUMBERS_GLOBAL = [
     openWBNumberEntityDescription(
         key="minCurrentMinPv",
         name="Mindestladestrom (Modus Min+PV-Laden)",
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class="Power",
         native_min_value=6.0,
         native_max_value=16.0,
@@ -738,7 +738,7 @@ NUMBERS_PER_LP = [
     openWBNumberEntityDescription(
         key="current",
         name="Ladestromvorgabe (Modus Sofortladen)",
-        native_unit_of_measurement=ELECTRIC_CURRENT_AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class="Power",
         native_min_value=6.0,
         native_max_value=16.0,
