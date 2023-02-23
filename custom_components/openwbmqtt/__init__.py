@@ -84,6 +84,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         payload = str(call.data.get("target_current"))
         hass.components.mqtt.publish(hass, topic, payload)
+    
+    def fun_enable_disable_price_based_charging(call):
+        """Enable or disable price-based charging for charge point # --> set/lp#/etBasedCharging [0,1]."""
+        topic = f"{call.data.get('mqtt_prefix')}/set/lp{call.data.get('charge_point_id')}/etBasedCharging"
+        _LOGGER.debug("topic (enable_disable_price_based_charging): %s", topic)
+
+        if call.data.get("selected_status") == "On":
+            payload = str(1)
+            hass.components.mqtt.publish(hass, topic, payload)
+
+        else:
+            payload = str(0)
+            hass.components.mqtt.publish(hass, topic, payload)
 
     # Register our services with Home Assistant.
     hass.services.async_register(DOMAIN, "enable_disable_cp", fun_enable_disable_cp)
@@ -96,6 +109,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_register(
         DOMAIN, "change_charge_current_per_cp", fun_change_charge_current_per_cp
     )
+    hass.services.async_register(DOMAIN, "enable_disable_price_based_charging", fun_enable_disable_price_based_charging)
 
     # Return boolean to indicate that initialization was successfully.
     return True
@@ -108,6 +122,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_remove(DOMAIN, "change_global_charge_mode")
     hass.services.async_remove(DOMAIN, "change_charge_limitation_per_cp")
     hass.services.async_remove(DOMAIN, "change_charge_current_per_cp")
+    hass.services.async_remove(DOMAIN, "enable_disable_price_based_charging")
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     return unload_ok

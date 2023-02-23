@@ -38,12 +38,12 @@ async def async_setup_entry(
     for chargePoint in range(1, nChargePoints + 1):
         localSwitchesPerLP = copy.deepcopy(SWITCHES_PER_LP)
         for description in localSwitchesPerLP:
-            description.mqttTopicCommand = (
-                f"{mqttRoot}/set/lp{str(chargePoint)}/{description.mqttTopicCommand}"
-            )
-            description.mqttTopicCurrentValue = (
-                f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
-            )
+            if description.mqttTopicChargeMode:
+                description.mqttTopicCommand = f"{mqttRoot}/config/set/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+                description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
+            else:  # for manual SoC module
+                description.mqttTopicCommand = f"{mqttRoot}/set/lp/{str(chargePoint)}/{description.mqttTopicCommand}"
+                description.mqttTopicCurrentValue = f"{mqttRoot}/lp/{str(chargePoint)}/{description.mqttTopicCurrentValue}"
             switchList.append(
                 openwbSwitch(
                     unique_id=integrationUniqueID,
