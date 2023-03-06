@@ -137,3 +137,33 @@ change_charge_current_per_cp:
           min: 6
           max: 16
           step: 1  
+enable_disable_price_based_charging:
+  description: Enable or disable price-based charging
+  fields:
+    mqtt_prefix:
+      name: Prefix for MQTT topic
+      description: Prefix on the MQTT server that addresses the respective wallbox
+      default: 'openWB/openWB'
+      example: 'openWB/openWB'
+      required: true
+      selector:
+        text:
+    selected_status:
+      name: Price-based Charging
+      description: Desired price-based charging status
+      default: 'Off'
+      required: true
+      selector:
+        select:
+          options:
+            - 'On'
+            - 'Off'
+    charge_point_id:
+      name: Charge point ID
+      description: ID of the charge point which shall be enabled / disabled
+      default: 1
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 8
