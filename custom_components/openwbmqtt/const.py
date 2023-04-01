@@ -316,7 +316,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x), 2),
-        icon="mdi:transmission-tower-export",
+        icon="mdi:transmission-tower-import",
     ),
     openwbSensorEntityDescription(
         key="pv/WhCounter",
