@@ -286,7 +286,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 2),
-        icon="mdi:transmission-tower-import",
+        icon="mdi:transmission-tower-export",
     ),
     openwbSensorEntityDescription(
         key="evu/WhExported",
@@ -296,7 +296,7 @@ SENSORS_GLOBAL = [
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x) / 1000.0, 2),
-        icon="mdi:transmission-tower-export",
+        icon="mdi:transmission-tower-import",
     ),
     openwbSensorEntityDescription(
         key="evu/DailyYieldExportKwh",
@@ -306,7 +306,7 @@ SENSORS_GLOBAL = [
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         entity_registry_enabled_default=False,
         value_fn=lambda x: round(float(x), 2),
-        icon="mdi:transmission-tower-export",
+        icon="mdi:transmission-tower-import",
     ),
     openwbSensorEntityDescription(
         key="evu/DailyYieldImportKwh",
