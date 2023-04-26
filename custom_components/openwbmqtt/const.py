@@ -723,6 +723,28 @@ SELECTS_GLOBAL = [
             "Auto",
         ],
     ),
+    openwbSelectEntityDescription(
+        key="config/get/u1p3p/sofortPhases",
+        entity_category=EntityCategory.CONFIG,
+        name="Phasenumschaltung Sofort-Laden"
+        valueMapCurrentValue={
+            1: "1 Phase"
+            3: "3 Phasen"
+            4: "Auto"
+        },
+        valueMapCommand={
+            "1 Phase": 1,
+            "3 Phasen": 3,
+            "Auto": 4,
+        },
+        mqttTopicCommand="config/set/u1p3p/sofortPhases",
+        mqttTopicCurrentValue="config/get/u1p3p/sofortPhases",
+        modes=[
+            "1 Phase",
+            "3 Phasen",
+            "Auto",
+        ],
+    ),
 ]
 
 SELECTS_PER_LP = [
