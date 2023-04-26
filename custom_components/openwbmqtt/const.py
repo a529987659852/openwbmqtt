@@ -682,11 +682,11 @@ SELECTS_GLOBAL = [
     openwbSelectEntityDescription(
         key="config/get/u1p3p/nurpvPhases",
         entity_category=EntityCategory.CONFIG,
-        name="Phasenumschaltung PV-Laden"
+        name="Phasenumschaltung PV-Laden",
         valueMapCurrentValue={
-            1: "1 Phase"
-            3: "3 Phasen"
-            4: "Auto"
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
         },
         valueMapCommand={
             "1 Phase": 1,
@@ -704,11 +704,11 @@ SELECTS_GLOBAL = [
     openwbSelectEntityDescription(
         key="config/get/u1p3p/minundpvPhases",
         entity_category=EntityCategory.CONFIG,
-        name="Phasenumschaltung Min+PV-Laden"
+        name="Phasenumschaltung Min+PV-Laden",
         valueMapCurrentValue={
-            1: "1 Phase"
-            3: "3 Phasen"
-            4: "Auto"
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
         },
         valueMapCommand={
             "1 Phase": 1,
@@ -726,11 +726,11 @@ SELECTS_GLOBAL = [
     openwbSelectEntityDescription(
         key="config/get/u1p3p/sofortPhases",
         entity_category=EntityCategory.CONFIG,
-        name="Phasenumschaltung Sofort-Laden"
+        name="Phasenumschaltung Sofort-Laden",
         valueMapCurrentValue={
-            1: "1 Phase"
-            3: "3 Phasen"
-            4: "Auto"
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
         },
         valueMapCommand={
             "1 Phase": 1,
