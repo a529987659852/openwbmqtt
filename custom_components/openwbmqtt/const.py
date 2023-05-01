@@ -679,6 +679,118 @@ SELECTS_GLOBAL = [
             "Fahrzeug",
         ],
     ),
+    openwbSelectEntityDescription(
+        key="config/get/u1p3p/nurpvPhases",
+        entity_category=EntityCategory.CONFIG,
+        name="Phasenumschaltung PV-Laden",
+        valueMapCurrentValue={
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
+        },
+        valueMapCommand={
+            "1 Phase": 1,
+            "3 Phasen": 3,
+            "Auto": 4,
+        },
+        mqttTopicCommand="config/set/u1p3p/nurpvPhases",
+        mqttTopicCurrentValue="config/get/u1p3p/nurpvPhases",
+        modes=[
+            "1 Phase",
+            "3 Phasen",
+            "Auto",
+        ],
+    ),
+    openwbSelectEntityDescription(
+        key="config/get/u1p3p/minundpvPhases",
+        entity_category=EntityCategory.CONFIG,
+        name="Phasenumschaltung Min+PV-Laden",
+        valueMapCurrentValue={
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
+        },
+        valueMapCommand={
+            "1 Phase": 1,
+            "3 Phasen": 3,
+            "Auto": 4,
+        },
+        mqttTopicCommand="config/set/u1p3p/minundpvPhases",
+        mqttTopicCurrentValue="config/get/u1p3p/minundpvPhases",
+        modes=[
+            "1 Phase",
+            "3 Phasen",
+            "Auto",
+        ],
+    ),
+    openwbSelectEntityDescription(
+        key="config/get/u1p3p/sofortPhases",
+        entity_category=EntityCategory.CONFIG,
+        name="Phasenumschaltung Sofort-Laden",
+        valueMapCurrentValue={
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
+        },
+        valueMapCommand={
+            "1 Phase": 1,
+            "3 Phasen": 3,
+            "Auto": 4,
+        },
+        mqttTopicCommand="config/set/u1p3p/sofortPhases",
+        mqttTopicCurrentValue="config/get/u1p3p/sofortPhases",
+        modes=[
+            "1 Phase",
+            "3 Phasen",
+            "Auto",
+        ],
+    ),
+    openwbSelectEntityDescription(
+        key="config/get/u1p3p/nachtPhases",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        name="Phasenumschaltung (Modus Nacht-Laden)",
+        valueMapCurrentValue={
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
+        },
+        valueMapCommand={
+            "1 Phase": 1,
+            "3 Phasen": 3,
+            "Auto": 4,
+        },
+        mqttTopicCommand="config/set/u1p3p/nachtPhases",
+        mqttTopicCurrentValue="config/get/u1p3p/nachtPhases",
+        modes=[
+            "1 Phase",
+            "3 Phasen",
+            "Auto",
+        ],
+    ),
+    openwbSelectEntityDescription(
+        key="config/get/u1p3p/standbyPhases",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        name="Phasenumschaltung (Modus Standby)",
+        valueMapCurrentValue={
+            1: "1 Phase",
+            3: "3 Phasen",
+            4: "Auto",
+        },
+        valueMapCommand={
+            "1 Phase": 1,
+            "3 Phasen": 3,
+            "Auto": 4,
+        },
+        mqttTopicCommand="config/set/u1p3p/standbyPhases",
+        mqttTopicCurrentValue="config/get/u1p3p/standbyPhases",
+        modes=[
+            "1 Phase",
+            "3 Phasen",
+            "Auto",
+        ],
+    ),
 ]
 
 SELECTS_PER_LP = [
