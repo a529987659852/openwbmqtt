@@ -12,9 +12,9 @@ from homeassistant.components.number import DOMAIN, NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     DEVICE_DEFAULT_NAME,
-    ELECTRIC_CURRENT_AMPERE,
-    ENERGY_KILO_WATT_HOUR,
-    ENTITY_CATEGORY_CONFIG,
+    UnitOfElectricCurrent,
+    UnitOfEnergy,
+    EntityCategory,
     PERCENTAGE,
 )
 from homeassistant.core import HomeAssistant, callback
