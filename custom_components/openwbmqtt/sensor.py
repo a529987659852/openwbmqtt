@@ -1,11 +1,8 @@
-"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
 import copy
 from datetime import timedelta
-import logging
-import re
-
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -14,16 +11,22 @@ from homeassistant.helpers.device_registry import async_get as async_get_dev_reg
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt, slugify
+import logging
+import re
 
 from .common import OpenWBBaseEntity
 
 # Import global values.
 from .const import (
-    CHARGE_POINTS,
+    # CHARGE_POINTS,
     MQTT_ROOT_TOPIC,
     SENSORS_GLOBAL,
     SENSORS_PER_LP,
     openwbSensorEntityDescription,
+    SENSORS_PER_CHARGEPOINT,
+    SENSORS_PER_COUNTER,
+    SENSORS_PER_BATTERY,
+    SENSORS_PER_PVGENERATOR,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,41 +39,107 @@ async def async_setup_entry(
 
     integrationUniqueID = config.unique_id
     mqttRoot = config.data[MQTT_ROOT_TOPIC]
-    nChargePoints = config.data[CHARGE_POINTS]
+    devicetype = config.data["DEVICETYPE"]
+    deviceID = config.data["DEVICEID"]
+    # nChargePoints = config.data[CHARGE_POINTS]
 
     sensorList = []
-    # Create all global sensors.
-    global_sensors = copy.deepcopy(SENSORS_GLOBAL)
-    for description in global_sensors:
-        description.mqttTopicCurrentValue = f"{mqttRoot}/{description.key}"
-        _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
-        sensorList.append(
-            openwbSensor(
-                uniqueID=integrationUniqueID,
-                description=description,
-                device_friendly_name=integrationUniqueID,
-                mqtt_root=mqttRoot,
-            )
-        )
 
-    # Create all sensors for each charge point, respectively.
-    for chargePoint in range(1, nChargePoints + 1):
-        local_sensors_per_lp = copy.deepcopy(SENSORS_PER_LP)
-        for description in local_sensors_per_lp:
+    if devicetype == "chargepoint":
+        # Create sensors for chargepoint
+        SENSORS_PER_CHARGEPOINT_CP = copy.deepcopy(SENSORS_PER_CHARGEPOINT)
+        for description in SENSORS_PER_CHARGEPOINT_CP:
             description.mqttTopicCurrentValue = (
-                f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
+                f"{mqttRoot}/{devicetype}/{deviceID}/get/{description.key}"
             )
-            _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
             sensorList.append(
                 openwbSensor(
-                    uniqueID=integrationUniqueID,
+                    uniqueID=f"{integrationUniqueID}",
                     description=description,
-                    nChargePoints=int(nChargePoints),
-                    currentChargePoint=chargePoint,
-                    device_friendly_name=integrationUniqueID,
+                    device_friendly_name=f"Chargepoint {deviceID}",
                     mqtt_root=mqttRoot,
                 )
             )
+    if devicetype == "counter":
+        # Create sensors for counters, for example EVU
+        SENSORS_PER_COUNTER_CP = copy.deepcopy(SENSORS_PER_COUNTER)
+        for description in SENSORS_PER_COUNTER_CP:
+            description.mqttTopicCurrentValue = (
+                f"{mqttRoot}/{devicetype}/{deviceID}/get/{description.key}"
+            )
+            sensorList.append(
+                openwbSensor(
+                    uniqueID=f"{integrationUniqueID}",
+                    description=description,
+                    device_friendly_name=f"Counter {deviceID}",
+                    mqtt_root=mqttRoot,
+                )
+            )
+
+    if devicetype == "bat":
+        # Create sensors for batteries
+        SENSORS_PER_BATTERY_CP = copy.deepcopy(SENSORS_PER_BATTERY)
+        for description in SENSORS_PER_BATTERY_CP:
+            description.mqttTopicCurrentValue = (
+                f"{mqttRoot}/{devicetype}/{deviceID}/get/{description.key}"
+            )
+            sensorList.append(
+                openwbSensor(
+                    uniqueID=f"{integrationUniqueID}",
+                    description=description,
+                    device_friendly_name=f"Battery {deviceID}",
+                    mqtt_root=mqttRoot,
+                )
+            )
+
+    if devicetype == "pv":
+        # Create sensors for batteries
+        SENSORS_PER_PVGENERATOR_CP = copy.deepcopy(SENSORS_PER_PVGENERATOR)
+        for description in SENSORS_PER_PVGENERATOR_CP:
+            description.mqttTopicCurrentValue = (
+                f"{mqttRoot}/{devicetype}/{deviceID}/get/{description.key}"
+            )
+            sensorList.append(
+                openwbSensor(
+                    uniqueID=f"{integrationUniqueID}",
+                    description=description,
+                    device_friendly_name=f"PV {deviceID}",
+                    mqtt_root=mqttRoot,
+                )
+            )
+
+    # # Create all global sensors.
+    # global_sensors = copy.deepcopy(SENSORS_GLOBAL)
+    # for description in global_sensors:
+    #     description.mqttTopicCurrentValue = f"{mqttRoot}/{description.key}"
+    #     _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
+    #     sensorList.append(
+    #         openwbSensor(
+    #             uniqueID=integrationUniqueID,
+    #             description=description,
+    #             device_friendly_name=integrationUniqueID,
+    #             mqtt_root=mqttRoot,
+    #         )
+    #     )
+
+    # # Create all sensors for each charge point, respectively.
+    # for chargePoint in range(1, nChargePoints + 1):
+    #     local_sensors_per_lp = copy.deepcopy(SENSORS_PER_LP)
+    #     for description in local_sensors_per_lp:
+    #         description.mqttTopicCurrentValue = (
+    #             f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
+    #         )
+    #         _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
+    #         sensorList.append(
+    #             openwbSensor(
+    #                 uniqueID=integrationUniqueID,
+    #                 description=description,
+    #                 nChargePoints=int(nChargePoints),
+    #                 currentChargePoint=chargePoint,
+    #                 device_friendly_name=integrationUniqueID,
+    #                 mqtt_root=mqttRoot,
+    #             )
+    #         )
 
     async_add_entities(sensorList)
 
@@ -186,7 +255,10 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 device_registry.async_update_device
 
             # Update icon of countPhasesInUse
-            elif "countPhasesInUse" in self.entity_description.key:
+            elif (
+                "countPhasesInUse" in self.entity_description.key
+                or "phases_in_use" in self.entity_description.key
+            ):
                 if int(message.payload) == 0:
                     self._attr_icon = "mdi:numeric-0-circle-outline"
                 elif int(message.payload) == 1:

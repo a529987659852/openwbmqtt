@@ -1,8 +1,8 @@
-"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections.abc import Callable
+from dataclasses import dataclass
 
 import voluptuous as vol
 
@@ -21,44 +21,60 @@ from homeassistant.components.switch import SwitchDeviceClass, SwitchEntityDescr
 from homeassistant.const import (
     PERCENTAGE,
     Platform,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
-    UnitOfElectricPotential,
-    UnitOfElectricCurrent,
+    UnitOfFrequency,
 )
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.selector import selector
 
 PLATFORMS = [
-    Platform.SELECT,
+    # Platform.SELECT,
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
-    Platform.NUMBER,
-    Platform.SWITCH,
+    # Platform.NUMBER,
+    # Platform.SWITCH,
 ]
 
 # Global values
 DOMAIN = "openwbmqtt"
 MQTT_ROOT_TOPIC = "mqttroot"
-MQTT_ROOT_TOPIC_DEFAULT = "openWB"
-CHARGE_POINTS = "chargepoints"
-DEFAULT_CHARGE_POINTS = 1
+MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
+# CHARGE_POINTS = "chargepoints"
+# DEFAULT_CHARGE_POINTS = 1
 MANUFACTURER = "openWB"
 MODEL = "openWB"
 
 # Data schema required by configuration flow
+DATA_SCHEMA_Select_Version = vol.Schema(
+    {
+        vol.Required("OPENWB_Version", default=2): cv.positive_int,
+    }
+)
+
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
-        vol.Required(CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS): cv.positive_int,
+        # vol.Required(CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS): cv.positive_int,
+        vol.Required("DEVICETYPE"): selector(
+            {
+                "select": {
+                    "options": ["counter", "chargepoint", "pv", "bat"],
+                }
+            }
+        ),
+        vol.Required("DEVICEID"): cv.positive_int,
     }
 )
 
 
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
-    """Enhance the sensor entity description for openWB"""
+    """Enhance the sensor entity description for openWB."""
 
     value_fn: Callable | None = None
     valueMap: dict | None = None
@@ -67,7 +83,7 @@ class openwbSensorEntityDescription(SensorEntityDescription):
 
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
-    """Enhance the sensor entity description for openWB"""
+    """Enhance the sensor entity description for openWB."""
 
     state: Callable | None = None
     mqttTopicCurrentValue: str | None = None
@@ -75,7 +91,7 @@ class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
-    """Enhance the select entity description for openWB"""
+    """Enhance the select entity description for openWB."""
 
     valueMapCommand: dict | None = None
     valueMapCurrentValue: dict | None = None
@@ -86,7 +102,7 @@ class openwbSelectEntityDescription(SelectEntityDescription):
 
 @dataclass
 class openwbSwitchEntityDescription(SwitchEntityDescription):
-    """Enhance the select entity description for openWB"""
+    """Enhance the select entity description for openWB."""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
@@ -95,11 +111,587 @@ class openwbSwitchEntityDescription(SwitchEntityDescription):
 
 @dataclass
 class openWBNumberEntityDescription(NumberEntityDescription):
-    """Enhance the number entity description for openWB"""
+    """Enhance the number entity description for openWB."""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
     mqttTopicChargeMode: str | None = None
+
+
+SENSORS_PER_CHARGEPOINT = [
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L1)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L2)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L3)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="daily_imported",
+        name="Geladene Energie (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="daily_exported",
+        name="Entladene Energie (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        icon="mdi:counter",
+    ),
+    # openwbSensorEntityDescription(
+    #     key="evse_current",
+    #     name="EVSE Strom",
+    #     device_class=SensorDeviceClass.CURRENT,
+    #     state_class=SensorStateClass.MEASUREMENT,
+    #     native_unit_of_measurement=UnitOfElectricCurrent.MILLIAMPERE,
+    #     icon="mdi:current-ac",
+    # ),
+    openwbSensorEntityDescription(
+        key="exported",
+        name="Entladene Energie (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000, 3),
+        suggested_display_precision=0,
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="fault_str",
+        name="Fehlerbeschreibung",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda x: x.strip('"').strip(".")[0:255],
+    ),
+    openwbSensorEntityDescription(
+        key="imported",
+        name="Geladene Energie (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000, 3),
+        suggested_display_precision=0,
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="phases_in_use",
+        name="Aktive Phasen",
+        device_class=None,
+        native_unit_of_measurement=None,
+    ),
+    openwbSensorEntityDescription(
+        key="power",
+        name="Ladeleistung",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:car-electric-outline",
+    ),
+    openwbSensorEntityDescription(
+        key="state_str",
+        name="Ladezustand",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda x: x.strip('"').strip(".")[0:255],
+    ),
+    openwbSensorEntityDescription(
+        key="voltages",
+        name="Spannung (L1)",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        icon="mdi:sine-wave",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="voltages",
+        name="Spannung (L2)",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        icon="mdi:sine-wave",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="voltages",
+        name="Spannung (L3)",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        icon="mdi:sine-wave",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="power_factors",
+        name="Leistungsfaktor (L1)",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=None,
+        # icon=,
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="power_factors",
+        name="Leistungsfaktor (L2)",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=None,
+        # icon=,
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="power_factors",
+        name="Leistungsfaktor (L3)",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=None,
+        # icon=,
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="powers",
+        name="Leistung (L1)",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        icon="mdi:car-electric-outline",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="powers",
+        name="Leistung (L2)",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        icon="mdi:car-electric-outline",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="powers",
+        name="Leistung (L3)",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        icon="mdi:car-electric-outline",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="frequency",
+        name="Frequenz",
+        device_class=SensorDeviceClass.FREQUENCY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfFrequency.HERTZ,
+        # icon="mdi:current-ac",
+    ),
+]
+
+BINARY_SENSORS_PER_CHARGEPOINT = [
+    openwbBinarySensorEntityDescription(
+        key="plug_state",
+        name="Ladekabel",
+        device_class=BinarySensorDeviceClass.PLUG,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="charge_state",
+        name="Autoladestatus",
+        device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+    ),
+    openwbBinarySensorEntityDescription(
+        key="fault_state",
+        name="Fehler",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+]
+
+SENSORS_PER_COUNTER = [
+    openwbSensorEntityDescription(
+        key="voltages",
+        name="Spannung (L1)",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        icon="mdi:sine-wave",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="voltages",
+        name="Spannung (L2)",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        icon="mdi:sine-wave",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="voltages",
+        name="Spannung (L3)",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        icon="mdi:sine-wave",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="power_factors",
+        name="Leistungsfaktor (L1)",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=None,
+        # icon=,
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="power_factors",
+        name="Leistungsfaktor (L2)",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=None,
+        # icon=,
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="power_factors",
+        name="Leistungsfaktor (L3)",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=None,
+        # icon=,
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="powers",
+        name="Leistung (L1)",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        icon="mdi:transmission-tower",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="powers",
+        name="Leistung (L2)",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        icon="mdi:transmission-tower",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="powers",
+        name="Leistung (L3)",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        icon="mdi:transmission-tower",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="frequency",
+        name="Frequenz",
+        device_class=SensorDeviceClass.FREQUENCY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfFrequency.HERTZ,
+        # icon="mdi:current-ac",
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L1)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L2)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L3)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="power",
+        name="Leistung",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        # state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+        icon="mdi:transmission-tower",
+    ),
+    openwbSensorEntityDescription(
+        key="fault_str",
+        name="Fehlerbeschreibung",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda x: x.strip('"').strip(".")[0:255],
+    ),
+    openwbSensorEntityDescription(
+        key="exported",
+        name="Exportierte Energie (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000, 3),
+        suggested_display_precision=0,
+        icon="mdi:transmission-tower-export",
+    ),
+    openwbSensorEntityDescription(
+        key="imported",
+        name="Importierte Energie (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000, 3),
+        suggested_display_precision=0,
+        icon="mdi:transmission-tower-import",
+    ),
+    openwbSensorEntityDescription(
+        key="daily_imported",
+        name="Importierte Energie (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=1,
+        icon="mdi:transmission-tower-import",
+    ),
+    openwbSensorEntityDescription(
+        key="daily_exported",
+        name="Exportierte Energie (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=1,
+        icon="mdi:transmission-tower-export",
+    ),
+]
+
+BINARY_SENSORS_PER_COUNTER = [
+    openwbBinarySensorEntityDescription(
+        key="fault_state",
+        name="Fehler",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+]
+
+SENSORS_PER_BATTERY = [
+    openwbSensorEntityDescription(
+        key="soc",
+        name="Ladung",
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+        # icon="mdi:transmission-tower",
+    ),
+    openwbSensorEntityDescription(
+        key="power",
+        name="Leistung",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+        icon="mdi:battery-charging",
+    ),
+    openwbSensorEntityDescription(
+        key="fault_str",
+        name="Fehlerbeschreibung",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda x: x.strip('"').strip(".")[0:255],
+    ),
+    openwbSensorEntityDescription(
+        key="exported",
+        name="Entladene Energie (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000, 3),
+        suggested_display_precision=0,
+        icon="mdi:battery-arrow-up",
+    ),
+    openwbSensorEntityDescription(
+        key="imported",
+        name="Geladene Energie (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000, 3),
+        suggested_display_precision=0,
+        icon="mdi:battery-arrow-down",
+    ),
+    openwbSensorEntityDescription(
+        key="daily_imported",
+        name="Geladene Energie (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=1,
+        icon="mdi:battery-arrow-down",
+    ),
+    openwbSensorEntityDescription(
+        key="daily_exported",
+        name="Entladene Energie (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=1,
+        icon="mdi:battery-arrow-up",
+    ),
+]
+
+BINARY_SENSORS_PER_BATTERY = [
+    openwbBinarySensorEntityDescription(
+        key="fault_state",
+        name="Fehler",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+]
+
+SENSORS_PER_PVGENERATOR = [
+    openwbSensorEntityDescription(
+        key="daily_exported",
+        name="Zählerstand (Heute)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=1,
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="monthly_exported",
+        name="Zählerstand (Monat)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=0,
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="yearly_exported",
+        name="Zählerstand (Jahr)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=0,
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="exported",
+        name="Zählerstand (Gesamt)",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda x: round(float(x) / 1000.0, 3),
+        suggested_display_precision=0,
+        icon="mdi:counter",
+    ),
+    openwbSensorEntityDescription(
+        key="power",
+        name="Leistung",
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+        icon="mdi:solar-power",
+        suggested_display_precision=0,
+        value_fn=lambda x: abs(float(x)),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L1)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L2)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[1]),
+    ),
+    openwbSensorEntityDescription(
+        key="currents",
+        name="Strom (L3)",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        icon="mdi:current-ac",
+        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+    ),
+    openwbSensorEntityDescription(
+        key="fault_str",
+        name="Fehlerbeschreibung",
+        device_class=None,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda x: x.strip('"').strip(".")[0:255],
+    ),
+]
+
+BINARY_SENSORS_PER_PVGENERATOR = [
+    openwbBinarySensorEntityDescription(
+        key="fault_state",
+        name="Fehler",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+]
 
 
 # List of global sensors that are relevant to the entire wallbox
