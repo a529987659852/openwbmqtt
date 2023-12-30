@@ -7,10 +7,11 @@
             "user": {
                 "data": {
                     "mqttroot": "MQTT-Wurzeltopic",
-                    "chargepoints": "Anzahl der Ladepunkte der openWB"
+                    "DEVICEID": "Geräte-ID in openWB (-> Status-Tab)",
+                    "DEVICETYPE": "Gerätetyp"
                 },
-                "description": "Richte die openWB-Integration ein.",
-                "title": "openWB-Integration in Home Assistant mittels MQTT"
+                "description": "Richte die openWB2-Integration ein.",
+                "title": "openWB2-Integration in Home Assistant mittels MQTT"
             }
         }
     }

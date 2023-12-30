@@ -41,33 +41,26 @@ PLATFORMS = [
 ]
 
 # Global values
-DOMAIN = "openwbmqtt"
+DOMAIN = "openwb2mqtt"
 MQTT_ROOT_TOPIC = "mqttroot"
 MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
-# CHARGE_POINTS = "chargepoints"
-# DEFAULT_CHARGE_POINTS = 1
+DEVICETYPE = "DEVICETYPE"
+DEVICEID = "DEVICEID"
 MANUFACTURER = "openWB"
 MODEL = "openWB"
 
 # Data schema required by configuration flow
-DATA_SCHEMA_Select_Version = vol.Schema(
-    {
-        vol.Required("OPENWB_Version", default=2): cv.positive_int,
-    }
-)
-
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(MQTT_ROOT_TOPIC, default=MQTT_ROOT_TOPIC_DEFAULT): cv.string,
-        # vol.Required(CHARGE_POINTS, default=DEFAULT_CHARGE_POINTS): cv.positive_int,
-        vol.Required("DEVICETYPE"): selector(
+        vol.Required(DEVICETYPE): selector(
             {
                 "select": {
                     "options": ["counter", "chargepoint", "pv", "bat"],
                 }
             }
         ),
-        vol.Required("DEVICEID"): cv.positive_int,
+        vol.Required(DEVICEID): cv.positive_int,
     }
 )
 
