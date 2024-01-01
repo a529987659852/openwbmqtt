@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+import datetime
+import json
 
+import pytz
 import voluptuous as vol
 
 from homeassistant.components.binary_sensor import (
@@ -24,22 +27,19 @@ from homeassistant.const import (
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
     UnitOfEnergy,
+    UnitOfFrequency,
     UnitOfLength,
     UnitOfPower,
-    UnitOfFrequency,
 )
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import EntityCategory
-from homeassistant.helpers.selector import selector
 from homeassistant.helpers.selector import (
     SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    selector,
 )
-
-import json
-import datetime, pytz
 
 PLATFORMS = [
     Platform.SELECT,
@@ -52,7 +52,7 @@ PLATFORMS = [
 # Global values
 DOMAIN = "openwb2mqtt"
 MQTT_ROOT_TOPIC = "mqttroot"
-MQTT_ROOT_TOPIC_DEFAULT = "openWB/openWB"
+MQTT_ROOT_TOPIC_DEFAULT = "openWB"
 DEVICETYPE = "DEVICETYPE"
 DEVICEID = "DEVICEID"
 MANUFACTURER = "openWB"
