@@ -6,6 +6,8 @@ from .const import DOMAIN, MANUFACTURER, MODEL
 class OpenWBBaseEntity:
     """Openwallbox entity base class."""
 
+    deviceID: int | None = None
+
     def __init__(
         self,
         device_friendly_name: str,

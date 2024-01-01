@@ -13,6 +13,7 @@ from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt, slugify
 import logging
 import re
+import json
 
 from .common import OpenWBBaseEntity
 
@@ -27,6 +28,8 @@ from .const import (
     SENSORS_PER_COUNTER,
     SENSORS_PER_BATTERY,
     SENSORS_PER_PVGENERATOR,
+    SENSORS_CONTROLLER,
+    MANUFACTURER,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,15 +45,28 @@ async def async_setup_entry(
     devicetype = config.data["DEVICETYPE"]
     deviceID = config.data["DEVICEID"]
     # nChargePoints = config.data[CHARGE_POINTS]
-
     sensorList = []
+
+    if devicetype == "controller":
+        SENSORS_CONTROLLER_CP = copy.deepcopy(SENSORS_CONTROLLER)
+        for description in SENSORS_CONTROLLER_CP:
+            description.mqttTopicCurrentValue = f"{mqttRoot}/{description.key}"
+            sensorList.append(
+                openwbSensor(
+                    uniqueID=f"{integrationUniqueID}",
+                    description=description,
+                    device_friendly_name=MANUFACTURER,
+                    mqtt_root=mqttRoot,
+                )
+            )
 
     if devicetype == "chargepoint":
         # Create sensors for chargepoint
         SENSORS_PER_CHARGEPOINT_CP = copy.deepcopy(SENSORS_PER_CHARGEPOINT)
         for description in SENSORS_PER_CHARGEPOINT_CP:
             description.mqttTopicCurrentValue = (
-                f"{mqttRoot}/{devicetype}/{deviceID}/get/{description.key}"
+                # f"{mqttRoot}/{devicetype}/{deviceID}/get/{description.key}"
+                f"{mqttRoot}/{devicetype}/{deviceID}/{description.key}"
             )
             sensorList.append(
                 openwbSensor(
@@ -194,13 +210,17 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 )
 
             # Map values as defined in the value map dict.
+            # First try to map integer values, then string values.
+            # If no value can be mapped, use original value without conversion.
             if self.entity_description.valueMap is not None:
                 try:
                     self._attr_native_value = self.entity_description.valueMap.get(
                         int(self._attr_native_value)
                     )
                 except ValueError:
-                    self._attr_native_value = self._attr_native_value
+                    self._attr_native_value = self.entity_description.valueMap.get(
+                        self._attr_native_value, self._attr_native_value
+                    )
 
             # Reformat TimeRemaining --> timestamp.
             if "TimeRemaining" in self.entity_description.key:
@@ -233,16 +253,16 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 self._attr_native_value = f"{days} d {hours} h {mins} min"
 
             # If MQTT message contains IP --> set up configuration_url to visit the device
-            elif "ip_adresse" in self.entity_id:
+            elif "ip_adress" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
                 device = device_registry.async_get_device(
                     self.device_info.get("identifiers")
                 )
                 device_registry.async_update_device(
                     device.id,
-                    configuration_url=f"http://{message.payload}/openWB/web/index.php",
+                    configuration_url=f"http://{message.payload}",
                 )
-                device_registry.async_update_device
+                # device_registry.async_update_device
             # If MQTT message contains version --> set sw_version of the device
             elif "version" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
@@ -252,7 +272,19 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 device_registry.async_update_device(
                     device.id, sw_version=message.payload
                 )
-                device_registry.async_update_device
+                # device_registry.async_update_device
+            elif "ladepunkt" in self.entity_id:
+                device_registry = async_get_dev_reg(self.hass)
+                device = device_registry.async_get_device(
+                    self.device_info.get("identifiers")
+                )
+                try:
+                    device_registry.async_update_device(
+                        device.id,
+                        name=json.loads(message.payload).get("name").replace('"', ""),
+                    )
+                except:
+                    NotImplemented
 
             # Update icon of countPhasesInUse
             elif (
@@ -277,4 +309,8 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
             self.entity_description.mqttTopicCurrentValue,
             message_received,
             1,
+        )
+        _LOGGER.debug(
+            "Subscribed to MQTT topic: %s",
+            self.entity_description.mqttTopicCurrentValue,
         )

@@ -4,14 +4,7 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigFlow
 
 # Import global values.
-from .const import DATA_SCHEMA, DOMAIN, MQTT_ROOT_TOPIC
-
-devicetype = "DEVICETYPE"
-deviceid = "DEVICEID"
-
-from homeassistant import data_entry_flow
-from homeassistant import config_entries
-from typing import Any
+from .const import DATA_SCHEMA, DEVICEID, DEVICETYPE, DOMAIN, MQTT_ROOT_TOPIC
 
 
 class openwbmqttConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -30,10 +23,27 @@ class openwbmqttConfigFlow(ConfigFlow, domain=DOMAIN):
         """Ask user for configuration data."""
         if user_input is None:
             return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
-        title = f"{self.user_input[MQTT_ROOT_TOPIC]}-{user_input[devicetype]}-{user_input[deviceid]}"
+        if user_input[DEVICETYPE] == "controller":
+            title = f"{user_input[MQTT_ROOT_TOPIC]}-{user_input[DEVICETYPE]}"
+        else:
+            title = f"{user_input[MQTT_ROOT_TOPIC]}-{user_input[DEVICETYPE]}-{user_input[DEVICEID]}"
         await self.async_set_unique_id(title)
+
         # Abort if the same integration was already configured.
-        self._abort_if_unique_id_configured()
+        if user_input[DEVICETYPE] == "controller":
+            self._abort_if_unique_id_configured(error="controller_already_configured")
+        elif user_input[DEVICETYPE] == "bat":
+            self._abort_if_unique_id_configured(error="batterie_already_configured")
+        elif user_input[DEVICETYPE] == "counter":
+            self._abort_if_unique_id_configured(error="counter_already_configured")
+        elif user_input[DEVICETYPE] == "pv":
+            self._abort_if_unique_id_configured(error="pv_already_configured")
+        elif user_input[DEVICETYPE] == "chargepoint":
+            self._abort_if_unique_id_configured(error="chargepoint_already_configured")
+        else:
+            self._abort_if_unique_id_configured()
+
+        # Create entities
         return self.async_create_entry(
             title=title,
             data=user_input,

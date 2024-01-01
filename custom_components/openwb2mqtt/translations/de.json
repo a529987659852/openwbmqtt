@@ -1,7 +1,12 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Die Integration dieser openWB ist bereits konfiguriert. Bitte gib ein anderes MQTT-Wurzeltopic ein."
+            "already_configured": "Diese Integration ist schon konfiguriert. Geben Sie ein anderes MQTT-Wurzeltopic ein, wählen Sie einen anderen Gerätetyp aus oder geben Sie eine andere Geräte-ID ein.",
+            "controller_already_configured": "Diese Wallbox wurde schon konfiguriert. Geben Sie ein anderes MQTT-Wurzeltopic ein.",
+            "batterie_already_configured": "Diese Batterie wurde schon konfiguriert. Geben Sie ein anderes MQTT-Wurzeltopic oder eine andere Geräte-ID ein.",
+            "counter_already_configured": "Dieser Zähler wurde schon konfiguriert. Geben Sie ein anderes MQTT-Wurzeltopic oder eine andere Geräte-ID ein.",
+            "pv_already_configured": "Diese PV-Anlage wurde schon konfiguriert. Geben Sie ein anderes MQTT-Wurzeltopic oder eine andere Geräte-ID ein.",
+            "chargepoint_already_configured": "Dieser Ladepunkt wurde schon konfiguriert. Geben Sie ein anderes MQTT-Wurzeltopic oder eine andere Geräte-ID ein."
         },
         "step": {
             "user": {
@@ -10,8 +15,45 @@
                     "DEVICEID": "Geräte-ID in openWB (-> Status-Tab)",
                     "DEVICETYPE": "Gerätetyp"
                 },
-                "description": "Richte die openWB2-Integration ein.",
-                "title": "openWB2-Integration in Home Assistant mittels MQTT"
+                "description": "Geben Sie ein MQTT-Wurzelptopic ein, unter dem die openWB auf Ihrem MQTT-Server erreichbar ist und wählen Sie den Gerätetyp aus. \nBei den  Gerätetypen Zähler, Ladepunkt, Photovoltaikanlage und Batterie ist zusätzlich die Geräte-ID erforderlich. Diese finden Sie auf dem Status-Tab Ihrer openWB.\nBeim Gerätetyp Wallbox tragen Sie die Geräte-ID 0 ein.",
+                "title": "openWB (Version 2) mittels MQTT"
+            }
+        }
+    },
+    "selector": {
+        "config_selector_devicetype": {
+            "options": {
+                "controller": "Wallbox",
+                "counter": "Zähler",
+                "chargepoint": "Ladepunkt",
+                "pv": "Photovoltaikanlage",
+                "bat": "Batterie"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "sensor_lademodus": {
+                "state": {
+                    "Standby": "Standby",
+                    "Stop": "Stop",
+                    "Scheduled Charging": "Zielladen",
+                    "Time Charging": "Zeitladen",
+                       "Instant Charging": "Sofortladen",
+                    "PV Charging": "PV-Laden"
+                }
+            }
+
+        },
+        "select": {
+            "selector_chargepoint_chargemode": {
+                "state": {
+                    "Instant Charging": "Sofortladen",
+                    "Scheduled Charging": "Zielladen",
+                    "PV Charging": "PV-Laden",
+                    "Stop": "Stop",
+                    "Standby": "Standby"
+                }
             }
         }
     }
