@@ -105,6 +105,7 @@ class openwbSelectEntityDescription(SelectEntityDescription):
     valueMapCurrentValue: dict | None = None
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
+    value_fn: Callable | None = None
     modes: list | None = None
 
 
@@ -399,23 +400,23 @@ SELECTS_PER_CHARGEPOINT = [
         name="Lademodus",
         translation_key="selector_chargepoint_chargemode",  # translation is maintained in translations/<lang>.json via this translation_key
         valueMapCurrentValue={
+            "instant_charging": "Instant Charging",
+            "scheduled_charging": "Scheduled Charging",
+            "pv_charging": "PV Charging",
             "standby": "Standby",
             "stop": "Stop",
-            "scheduled_charging": "Scheduled Charging",
             # "time_charging": "Time Charging",
-            "instant_charging": "Instant Charging",
-            "pv_charging": "PV Charging",
         },
         valueMapCommand={
+            "Instant Charging": "instant_charging",
+            "Scheduled Charging": "scheduled_charging",
+            "PV Charging": "pv_charging",
             "Standby": "standby",
             "Stop": "stop",
-            "Scheduled Charging": "scheduled_charging",
             # "Time Charging": "time_charging",
-            "Instant Charging": "instant_charging",
-            "PV Charging": "pv_charging",
         },
-        mqttTopicCommand="set/vehicle/template/charge_template",
-        # mqttTopicCurrentValue="global/ChargeMode",
+        mqttTopicCommand="set/vehicle/template/charge_template/_chargeTemplateID_/chargemode/selected",
+        mqttTopicCurrentValue="get/connected_vehicle/config",
         options=[
             "Instant Charging",
             "Scheduled Charging",
@@ -423,8 +424,10 @@ SELECTS_PER_CHARGEPOINT = [
             "Stop",
             "Standby",
         ],
+        value_fn=lambda x: json.loads(x).get("chargemode"),
     ),
 ]
+
 
 SENSORS_PER_COUNTER = [
     openwbSensorEntityDescription(

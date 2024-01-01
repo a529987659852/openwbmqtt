@@ -15,6 +15,7 @@ from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
 from .const import (
+    DOMAIN,
     MANUFACTURER,
     # CHARGE_POINTS,
     MQTT_ROOT_TOPIC,
@@ -43,8 +44,8 @@ async def async_setup_entry(
     if devicetype == "chargepoint":
         SELECTS_PER_CHARGEPOINT_CP = copy.deepcopy(SELECTS_PER_CHARGEPOINT)
         for description in SELECTS_PER_CHARGEPOINT_CP:
-            # description.mqttTopicCommand = None
-            description.mqttTopicCurrentValue = None
+            description.mqttTopicCommand = f"{mqttRoot}/{description.mqttTopicCommand}"
+            description.mqttTopicCurrentValue = f"{mqttRoot}/{devicetype}/{deviceID}/{description.mqttTopicCurrentValue}"
             selectList.append(
                 openwbSelect(
                     unique_id=f"{integrationUniqueID}",
@@ -77,7 +78,7 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
             device_friendly_name=device_friendly_name,
             mqtt_root=mqtt_root,
         )
-        """Initialize the inverter operation mode setting entity."""
+        # Initialize the inverter operation mode setting entity.
         self.entity_description = description
 
         if nChargePoints:
@@ -97,51 +98,80 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
         self.deviceID = deviceID
         self.mqtt_root = mqtt_root
 
-    # async def async_added_to_hass(self):
-    #     """Subscribe to MQTT events."""
+    async def async_added_to_hass(self):
+        """Subscribe to MQTT events."""
 
-    #     @callback
-    #     def message_received(message):
-    #         """Handle new MQTT messages."""
-    #         try:
-    #             self._attr_current_option = (
-    #                 self.entity_description.valueMapCurrentValue.get(
-    #                     int(message.payload)
-    #                 )
-    #             )
-    #         except ValueError:
-    #             self._attr_current_option = None
+        @callback
+        def message_received(message):
+            """Handle new MQTT messages.
 
-    #         self.async_write_ha_state()
+            If defined, convert and map values.
+            """
+            # Convert data if a conversion function is defined
+            if self.entity_description.value_fn is not None:
+                message.payload = self.entity_description.value_fn(message.payload)
+            # Map values as defined in the value map dict.
+            # First try to map integer values, then string values.
+            # If no value can be mapped, use original value without conversion.
+            if self.entity_description.valueMapCurrentValue is not None:
+                try:
+                    self._attr_current_option = (
+                        self.entity_description.valueMapCurrentValue.get(
+                            int(message.payload)
+                        )
+                    )
+                except ValueError:
+                    self._attr_current_option = (
+                        self.entity_description.valueMapCurrentValue.get(
+                            message.payload, None
+                        )
+                    )
+            else:
+                self._attr_current_option = message.payload
 
-    #     # Subscribe to MQTT topic and connect callack message
-    #     if self.entity_description.mqttTopicCurrentValue is not None:
-    #         await mqtt.async_subscribe(
-    #             self.hass,
-    #             self.entity_description.mqttTopicCurrentValue,
-    #             message_received,
-    #             1,
-    #         )
+            self.async_write_ha_state()
+
+        # Subscribe to MQTT topic and connect callack message
+        if self.entity_description.mqttTopicCurrentValue is not None:
+            await mqtt.async_subscribe(
+                self.hass,
+                self.entity_description.mqttTopicCurrentValue,
+                message_received,
+                1,
+            )
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         success = self.publishToMQTT(option)
         if success:
-            self._attr_current_option = option
-            self.async_write_ha_state()
-        else:
-            _LOGGER.error("Error publishing MQTT message")
+            # self._attr_current_option = option
+            # self.async_write_ha_state()
+            return
+        _LOGGER.error("Error publishing MQTT message")
 
     def publishToMQTT(self, commandValueToPublish) -> bool:
-        # topic = f"{self.entity_description.mqttTopicCommand}"
+        """Publish message to MQTT.
+
+        If defined, you can remap the value in HA to the value that is required by the integration.
+        """
         publish_mqtt_message = False
-        chargeTemplateID = self.get_assigned_charge_profile(
-            self.hass,
-            "openwb2mqtt",
-        )
-        if chargeTemplateID is not None:
-            topic = f"{self.mqtt_root}/{self.entity_description.mqttTopicCommand}/{chargeTemplateID}/chargemode/selected"
-            _LOGGER.debug("MQTT topic: %s", topic)
+        topic = self.entity_description.mqttTopicCommand
+
+        # Modify topic: Chargemode
+        if "lademodus" in self.entity_id:
+            chargeTemplateID = self.get_assigned_charge_profile(
+                self.hass,
+                DOMAIN,
+            )
+            if chargeTemplateID is not None:
+                # Replace placeholders
+                if "_chargeTemplateID_" in topic:
+                    topic = topic.replace("_chargeTemplateID_", chargeTemplateID)
+
+        _LOGGER.debug("MQTT topic: %s", topic)
+
+        # Modify commandValueToPublish if mapping table is defined
+        if self.entity_description.valueMapCommand is not None:
             try:
                 payload = self.entity_description.valueMapCommand.get(
                     commandValueToPublish
@@ -150,9 +180,11 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
                 publish_mqtt_message = True
             except ValueError:
                 publish_mqtt_message = False
+        else:
+            payload = commandValueToPublish
 
-            if publish_mqtt_message:
-                self.hass.components.mqtt.publish(self.hass, topic, payload)
+        if publish_mqtt_message:
+            self.hass.components.mqtt.publish(self.hass, topic, payload)
 
         return publish_mqtt_message
 
@@ -160,13 +192,13 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
     def get_assigned_charge_profile(
         self, hass: HomeAssistant, domain: str
     ) -> str | None:
-        """Get the chosen pipeline for a domain."""
+        """Get the charge profile that is currently assigned to this charge point."""
         ent_reg = entity_registry.async_get(hass)
         # sensor.openwb_openwb_chargepoint_4_lade_profil
         unique_id = slugify(f"{self.mqtt_root}_chargepoint_{self.deviceID}_lade_profil")
         charge_profile_id = ent_reg.async_get_entity_id(
             Platform.SENSOR,
-            "openwb2mqtt",
+            DOMAIN,
             unique_id,
         )
         if charge_profile_id is None:
