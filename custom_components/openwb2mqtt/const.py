@@ -80,6 +80,22 @@ DATA_SCHEMA = vol.Schema(
 )
 
 
+def _splitListToFloat(x: list, desiredValueIndex: int) -> float | None:
+    """Extract float value from list at a specified index.
+
+    Use this function if the MQTT topic contains a list of values, and you
+    want to extract the i-th value from the list.
+    For example MQTT = [1.0, 2.0, 3.0] --> extract 3rd value --> sensor value = 3.0
+    """
+    x = x.replace("[", "")
+    x = x.replace("]", "")
+    try:
+        y = float(x.split(",")[desiredValueIndex])
+    except (IndexError, ValueError):
+        y = None
+    return y
+
+
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB."""
@@ -135,7 +151,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="get/currents",
@@ -144,7 +160,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="get/currents",
@@ -153,7 +169,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="get/daily_imported",
@@ -238,7 +254,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         icon="mdi:sine-wave",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="get/voltages",
@@ -247,7 +263,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         icon="mdi:sine-wave",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="get/voltages",
@@ -256,7 +272,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         icon="mdi:sine-wave",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="get/power_factors",
@@ -265,7 +281,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=None,
         # icon=,
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="get/power_factors",
@@ -274,7 +290,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=None,
         # icon=,
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="get/power_factors",
@@ -283,7 +299,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=None,
         # icon=,
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="get/powers",
@@ -292,7 +308,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         icon="mdi:car-electric-outline",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="get/powers",
@@ -301,7 +317,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         icon="mdi:car-electric-outline",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="get/powers",
@@ -310,7 +326,7 @@ SENSORS_PER_CHARGEPOINT = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         icon="mdi:car-electric-outline",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="get/frequency",
@@ -437,7 +453,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         icon="mdi:sine-wave",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="voltages",
@@ -446,7 +462,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         icon="mdi:sine-wave",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="voltages",
@@ -455,7 +471,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         icon="mdi:sine-wave",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="power_factors",
@@ -464,7 +480,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=None,
         # icon=,
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="power_factors",
@@ -473,7 +489,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=None,
         # icon=,
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="power_factors",
@@ -482,7 +498,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=None,
         # icon=,
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="powers",
@@ -491,7 +507,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         icon="mdi:transmission-tower",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="powers",
@@ -500,7 +516,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         icon="mdi:transmission-tower",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="powers",
@@ -509,7 +525,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         icon="mdi:transmission-tower",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="frequency",
@@ -526,7 +542,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="currents",
@@ -535,7 +551,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="currents",
@@ -544,7 +560,7 @@ SENSORS_PER_COUNTER = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="power",
@@ -751,7 +767,7 @@ SENSORS_PER_PVGENERATOR = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[0].replace("[", "")),
+        value_fn=lambda x: _splitListToFloat(x, 0),
     ),
     openwbSensorEntityDescription(
         key="currents",
@@ -760,7 +776,7 @@ SENSORS_PER_PVGENERATOR = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[1]),
+        value_fn=lambda x: _splitListToFloat(x, 1),
     ),
     openwbSensorEntityDescription(
         key="currents",
@@ -769,7 +785,7 @@ SENSORS_PER_PVGENERATOR = [
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         icon="mdi:current-ac",
-        value_fn=lambda x: float(x.split(",")[2].replace("]", "")),
+        value_fn=lambda x: _splitListToFloat(x, 2),
     ),
     openwbSensorEntityDescription(
         key="fault_str",
