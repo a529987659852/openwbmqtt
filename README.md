@@ -1,6 +1,16 @@
-# TODO: Update to for openWB2
+# Example Configuration for openWB2
 
-# openwbmqtt
+How to find out the device ID and MQTT root?
+
+This image shows an example of the MQTT topics published by openWB2 and how to identify the MQTT root topic
+<img width="1080" alt="HowToConfigureChargePoint-MQTT" src="https://github.com/a529987659852/openwbmqtt/assets/69649604/6ae4c107-e88a-4155-b8ef-d947f819d716">
+
+This image shows the openWB2 status page (http://<your-ip>/openWB/web/settings/#/Status) and the device IDs:
+![HowToConfigureChargepoint-Status](https://github.com/a529987659852/openwbmqtt/assets/69649604/621be5ee-0a75-44ea-a652-6197ae368f49)
+
+
+
+# To be done: openwbmqtt
 
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
 
