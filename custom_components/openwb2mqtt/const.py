@@ -96,6 +96,19 @@ def _splitListToFloat(x: list, desiredValueIndex: int) -> float | None:
     return y
 
 
+def _convertDateTime(x: str) -> datetime.datetime | None:
+    """Convert string to datetime object.
+
+    Assume that the local time zone is the same as the openWB time zone.
+    """
+    a = json.loads(x).get("timestamp")
+    if a is not None:
+        dateTimeObject = datetime.datetime.strptime(a, "%m/%d/%Y, %H:%M:%S")
+        dateTimeObject = dateTimeObject.astimezone(tz=None)
+        return dateTimeObject
+    return a
+
+
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
     """Enhance the sensor entity description for openWB."""
@@ -387,6 +400,27 @@ SENSORS_PER_CHARGEPOINT = [
             "pv_charging": "PV Charging",
         },
         translation_key="sensor_lademodus",
+    ),
+    openwbSensorEntityDescription(
+        key="get/connected_vehicle/soc",
+        name="Ladung",
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+        suggested_display_precision=0,
+        value_fn=lambda x: json.loads(x).get("soc"),
+    ),
+    openwbSensorEntityDescription(
+        key="get/connected_vehicle/soc",
+        name="SoC-Datenaktualisierung",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        native_unit_of_measurement=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:clock-time-eight",
+        value_fn=lambda x: _convertDateTime(x),
+        # Example: "01/02/2024, 15:29:12"
     ),
 ]
 
