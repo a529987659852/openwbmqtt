@@ -1,4 +1,4 @@
-"""OpenWB Selector"""
+"""OpenWB Selector."""
 from __future__ import annotations
 
 import copy
@@ -7,21 +7,19 @@ import logging
 from homeassistant.components import mqtt
 from homeassistant.components.select import DOMAIN, SelectEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory, Platform
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import entity_registry
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
 from .const import (
-    DOMAIN,
-    MANUFACTURER,
-    # CHARGE_POINTS,
+    DEVICEID,
+    DEVICETYPE,
+    DOMAIN as INTEGRATION_DOMAIN,
     MQTT_ROOT_TOPIC,
-    SELECTS_GLOBAL,
     SELECTS_PER_CHARGEPOINT,
-    SELECTS_PER_LP,
     openwbSelectEntityDescription,
 )
 
@@ -33,11 +31,11 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
+    """Initialize the select and the openWB device."""
     integrationUniqueID = config_entry.unique_id
     mqttRoot = config_entry.data[MQTT_ROOT_TOPIC]
-    devicetype = config_entry.data["DEVICETYPE"]
-    deviceID = config_entry.data["DEVICEID"]
-    # nChargePoints = config_entry.data[CHARGE_POINTS]
+    devicetype = config_entry.data[DEVICETYPE]
+    deviceID = config_entry.data[DEVICEID]
 
     selectList = []
 
@@ -70,8 +68,6 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
         description: openwbSelectEntityDescription,
         mqtt_root: str,
         deviceID: int | None = None,
-        currentChargePoint: int | None = None,
-        nChargePoints: int | None = None,
     ) -> None:
         """Initialize the sensor and the openWB device."""
         super().__init__(
@@ -80,19 +76,9 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
         )
         # Initialize the inverter operation mode setting entity.
         self.entity_description = description
-
-        if nChargePoints:
-            self._attr_unique_id = slugify(
-                f"{unique_id}-CP{currentChargePoint}-{description.name}"
-            )
-            self.entity_id = (
-                f"{DOMAIN}.{unique_id}-CP{currentChargePoint}-{description.name}"
-            )
-            self._attr_name = f"{description.name} (LP{currentChargePoint})"
-        else:
-            self._attr_unique_id = slugify(f"{unique_id}-{description.name}")
-            self.entity_id = f"{DOMAIN}.{unique_id}-{description.name}"
-            self._attr_name = description.name
+        self._attr_unique_id = slugify(f"{unique_id}-{description.name}")
+        self.entity_id = f"{DOMAIN}.{unique_id}-{description.name}"
+        self._attr_name = description.name
 
         self._attr_current_option = None
         self.deviceID = deviceID
@@ -161,7 +147,7 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
         if "lademodus" in self.entity_id:
             chargeTemplateID = self.get_assigned_charge_profile(
                 self.hass,
-                DOMAIN,
+                INTEGRATION_DOMAIN,
             )
             if chargeTemplateID is not None:
                 # Replace placeholders
@@ -193,12 +179,12 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
         self, hass: HomeAssistant, domain: str
     ) -> str | None:
         """Get the charge profile that is currently assigned to this charge point."""
-        ent_reg = entity_registry.async_get(hass)
+        ent_reg = er.async_get(hass)
         # sensor.openwb_openwb_chargepoint_4_lade_profil
         unique_id = slugify(f"{self.mqtt_root}_chargepoint_{self.deviceID}_lade_profil")
         charge_profile_id = ent_reg.async_get_entity_id(
             Platform.SENSOR,
-            DOMAIN,
+            domain,
             unique_id,
         )
         if charge_profile_id is None:

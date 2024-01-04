@@ -1,4 +1,4 @@
-"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
 import copy
@@ -8,7 +8,6 @@ from homeassistant.components import mqtt
 from homeassistant.components.binary_sensor import DOMAIN, BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
@@ -16,15 +15,14 @@ from .common import OpenWBBaseEntity
 
 # Import global values.
 from .const import (
-    BINARY_SENSORS_GLOBAL,
-    BINARY_SENSORS_PER_LP,
-    # CHARGE_POINTS,
-    MQTT_ROOT_TOPIC,
-    openwbBinarySensorEntityDescription,
+    BINARY_SENSORS_PER_BATTERY,
     BINARY_SENSORS_PER_CHARGEPOINT,
     BINARY_SENSORS_PER_COUNTER,
-    BINARY_SENSORS_PER_BATTERY,
     BINARY_SENSORS_PER_PVGENERATOR,
+    DEVICEID,
+    DEVICETYPE,
+    MQTT_ROOT_TOPIC,
+    openwbBinarySensorEntityDescription,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,9 +34,8 @@ async def async_setup_entry(
     """Set up sensors for openWB."""
     integrationUniqueID = config.unique_id
     mqttRoot = config.data[MQTT_ROOT_TOPIC]
-    # nChargePoints = config.data[CHARGE_POINTS]
-    devicetype = config.data["DEVICETYPE"]
-    deviceID = config.data["DEVICEID"]
+    devicetype = config.data[DEVICETYPE]
+    deviceID = config.data[DEVICEID]
 
     sensorList = []
 
@@ -121,38 +118,6 @@ async def async_setup_entry(
                 )
             )
 
-    # # Create all global sensors.
-    # global_sensors = copy.deepcopy(BINARY_SENSORS_GLOBAL)
-    # for description in global_sensors:
-    #     description.mqttTopicCurrentValue = f"{mqttRoot}/{description.key}"
-    #     _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
-    #     sensorList.append(
-    #         openwbBinarySensor(
-    #             uniqueID=integrationUniqueID,
-    #             description=description,
-    #             device_friendly_name=integrationUniqueID,
-    #             mqtt_root=mqttRoot,
-    #         )
-    #     )
-    # # Create all sensors for each charge point, respectively.
-    # for chargePoint in range(1, nChargePoints + 1):
-    #     local_sensors_per_lp = copy.deepcopy(BINARY_SENSORS_PER_LP)
-    #     for description in local_sensors_per_lp:
-    #         description.mqttTopicCurrentValue = (
-    #             f"{mqttRoot}/lp/{str(chargePoint)}/{description.key}"
-    #         )
-    #         _LOGGER.debug("mqttTopic: %s", description.mqttTopicCurrentValue)
-    #         sensorList.append(
-    #             openwbBinarySensor(
-    #                 uniqueID=integrationUniqueID,
-    #                 description=description,
-    #                 nChargePoints=int(nChargePoints),
-    #                 currentChargePoint=chargePoint,
-    #                 device_friendly_name=integrationUniqueID,
-    #                 mqtt_root=mqttRoot,
-    #             )
-    #         )
-
     async_add_entities(sensorList)
 
 
@@ -167,30 +132,17 @@ class openwbBinarySensor(OpenWBBaseEntity, BinarySensorEntity):
         device_friendly_name: str,
         mqtt_root: str,
         description: openwbBinarySensorEntityDescription,
-        nChargePoints: int | None = None,
-        currentChargePoint: int | None = None,
     ) -> None:
-        """Initialize the sensor."""
-
-        """Initialize the sensor and the openWB device."""
+        """Initialize the binary sensor and the openWB device."""
         super().__init__(
             device_friendly_name=device_friendly_name,
             mqtt_root=mqtt_root,
         )
 
         self.entity_description = description
-        if nChargePoints:
-            self._attr_unique_id = slugify(
-                f"{uniqueID}-CP{currentChargePoint}-{description.name}"
-            )
-            self.entity_id = (
-                f"{DOMAIN}.{uniqueID}-CP{currentChargePoint}-{description.name}"
-            )
-            self._attr_name = f"{description.name} (LP{currentChargePoint})"
-        else:
-            self._attr_unique_id = slugify(f"{uniqueID}-{description.name}")
-            self.entity_id = f"{DOMAIN}.{uniqueID}-{description.name}"
-            self._attr_name = description.name
+        self._attr_unique_id = slugify(f"{uniqueID}-{description.name}")
+        self.entity_id = f"{DOMAIN}.{uniqueID}-{description.name}"
+        self._attr_name = description.name
 
     async def async_added_to_hass(self):
         """Subscribe to MQTT events."""
