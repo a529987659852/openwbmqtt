@@ -1,8 +1,8 @@
-"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections.abc import Callable
+from dataclasses import dataclass
 
 import voluptuous as vol
 
@@ -21,20 +21,20 @@ from homeassistant.components.switch import SwitchDeviceClass, SwitchEntityDescr
 from homeassistant.const import (
     PERCENTAGE,
     Platform,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
-    UnitOfElectricPotential,
-    UnitOfElectricCurrent,
 )
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import EntityCategory
 
 PLATFORMS = [
-    Platform.SELECT,
-    Platform.SENSOR,
     Platform.BINARY_SENSOR,
     Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SENSOR,
     Platform.SWITCH,
 ]
 
@@ -58,7 +58,7 @@ DATA_SCHEMA = vol.Schema(
 
 @dataclass
 class openwbSensorEntityDescription(SensorEntityDescription):
-    """Enhance the sensor entity description for openWB"""
+    """Enhance the sensor entity description for openWB."""
 
     value_fn: Callable | None = None
     valueMap: dict | None = None
@@ -67,7 +67,7 @@ class openwbSensorEntityDescription(SensorEntityDescription):
 
 @dataclass
 class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
-    """Enhance the sensor entity description for openWB"""
+    """Enhance the sensor entity description for openWB."""
 
     state: Callable | None = None
     mqttTopicCurrentValue: str | None = None
@@ -75,7 +75,7 @@ class openwbBinarySensorEntityDescription(BinarySensorEntityDescription):
 
 @dataclass
 class openwbSelectEntityDescription(SelectEntityDescription):
-    """Enhance the select entity description for openWB"""
+    """Enhance the select entity description for openWB."""
 
     valueMapCommand: dict | None = None
     valueMapCurrentValue: dict | None = None
@@ -86,7 +86,7 @@ class openwbSelectEntityDescription(SelectEntityDescription):
 
 @dataclass
 class openwbSwitchEntityDescription(SwitchEntityDescription):
-    """Enhance the select entity description for openWB"""
+    """Enhance the select entity description for openWB."""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None
@@ -95,7 +95,7 @@ class openwbSwitchEntityDescription(SwitchEntityDescription):
 
 @dataclass
 class openWBNumberEntityDescription(NumberEntityDescription):
-    """Enhance the number entity description for openWB"""
+    """Enhance the number entity description for openWB."""
 
     mqttTopicCommand: str | None = None
     mqttTopicCurrentValue: str | None = None

@@ -1,4 +1,4 @@
-"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
 import copy
@@ -12,8 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import async_get as async_get_dev_reg
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import StateType
-from homeassistant.util import dt, slugify
+from homeassistant.util import dt as dt_util, slugify
 
 from .common import OpenWBBaseEntity
 
@@ -135,7 +134,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
 
             # Reformat TimeRemaining --> timestamp.
             if "TimeRemaining" in self.entity_description.key:
-                now = dt.utcnow()
+                now = dt_util.utcnow()
                 if "H" in self._attr_native_value:
                     tmp = self._attr_native_value.split()
                     delta = timedelta(hours=int(tmp[0]), minutes=int(tmp[2]))
@@ -173,7 +172,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                     device.id,
                     configuration_url=f"http://{message.payload}/openWB/web/index.php",
                 )
-                device_registry.async_update_device
+                # device_registry.async_update_device
             # If MQTT message contains version --> set sw_version of the device
             elif "version" in self.entity_id:
                 device_registry = async_get_dev_reg(self.hass)
@@ -183,7 +182,7 @@ class openwbSensor(OpenWBBaseEntity, SensorEntity):
                 device_registry.async_update_device(
                     device.id, sw_version=message.payload
                 )
-                device_registry.async_update_device
+                # device_registry.async_update_device
 
             # Update icon of countPhasesInUse
             elif "countPhasesInUse" in self.entity_description.key:

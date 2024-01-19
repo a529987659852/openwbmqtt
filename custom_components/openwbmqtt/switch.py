@@ -1,10 +1,11 @@
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
 import copy
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.switch import DOMAIN, SwitchDeviceClass, SwitchEntity
+from homeassistant.components.switch import DOMAIN, SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -26,7 +27,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-
+    """Return switch entities."""
     integrationUniqueID = config_entry.unique_id
     mqttRoot = config_entry.data[MQTT_ROOT_TOPIC]
     nChargePoints = config_entry.data[CHARGE_POINTS]
@@ -77,7 +78,7 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
             device_friendly_name=device_friendly_name,
             mqtt_root=mqtt_root,
         )
-        """Initialize the inverter operation mode setting entity."""
+        # Initialize the inverter operation mode setting entity
         self.entity_description = description
 
         if nChargePoints:
@@ -117,6 +118,7 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
 
     def turn_on(self, **kwargs):
         """Turn the switch on.
+
         After turn_on --> the result is published to MQTT.
         But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
         Only then, openWB has changed the setting as well.
@@ -127,6 +129,7 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
 
     def turn_off(self, **kwargs):
         """Turn the device off.
+
         After turn_off --> the result is published to MQTT.
         But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
         Only then, openWB has changed the setting as well.
@@ -136,10 +139,6 @@ class openwbSwitch(OpenWBBaseEntity, SwitchEntity):
         # self.schedule_update_ha_state()
 
     def publishToMQTT(self):
+        """Publish data to MQTT."""
         topic = f"{self.entity_description.mqttTopicCommand}"
         self.hass.components.mqtt.publish(self.hass, topic, str(int(self._attr_is_on)))
-        """if self._attr_is_on == True:
-            self.hass.components.mqtt.publish(self.hass, topic, str(1))
-        else:
-            self.hass.components.mqtt.publish(self.hass, topic, str(0))
-        """

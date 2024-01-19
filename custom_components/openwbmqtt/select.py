@@ -1,4 +1,4 @@
-"""OpenWB Selector"""
+"""OpenWB Selector."""
 from __future__ import annotations
 
 import copy
@@ -28,6 +28,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
+    """Return selectors."""
 
     integrationUniqueID = config_entry.unique_id
     mqttRoot = config_entry.data[MQTT_ROOT_TOPIC]
@@ -85,7 +86,7 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
             device_friendly_name=device_friendly_name,
             mqtt_root=mqtt_root,
         )
-        """Initialize the inverter operation mode setting entity."""
+        # Initialize the inverter operation mode setting entity
         self.entity_description = description
 
         if nChargePoints:
@@ -131,16 +132,18 @@ class openwbSelect(OpenWBBaseEntity, SelectEntity):
             )
 
     async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        self.publishToMQTT(option)
-        """After select --> the result is published to MQTT. 
+        """Change the selected option.
+
+        After select --> the result is published to MQTT.
         But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
         Only then, openWB has changed the setting as well.
         """
+        self.publishToMQTT(option)
         # self._attr_current_option = option
         # self.async_write_ha_state()
 
     def publishToMQTT(self, commandValueToPublish):
+        """Publish data to MQTT."""
         topic = f"{self.entity_description.mqttTopicCommand}"
         _LOGGER.debug("MQTT topic: %s", topic)
         try:

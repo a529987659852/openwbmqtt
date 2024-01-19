@@ -1,26 +1,15 @@
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass
 import logging
-from os import device_encoding, stat
 
-from sqlalchemy import desc
-
+# from sqlalchemy import desc
 from homeassistant.components import mqtt
 from homeassistant.components.number import DOMAIN, NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    DEVICE_DEFAULT_NAME,
-    UnitOfElectricCurrent,
-    UnitOfEnergy,
-    EntityCategory,
-    PERCENTAGE,
-)
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util import slugify
 
 from .common import OpenWBBaseEntity
@@ -87,7 +76,7 @@ async def async_setup_entry(
 
 
 class openWBNumber(OpenWBBaseEntity, NumberEntity):
-    """Entity representing openWB numbers"""
+    """Entity representing openWB numbers."""
 
     entity_description: openWBNumberEntityDescription
 
@@ -159,6 +148,7 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
 
     async def async_set_native_value(self, value):
         """Update the current value.
+
         After set_value --> the result is published to MQTT.
         But the HA sensor shall only change when the MQTT message on the /get/ topic is received.
         Only then, openWB has changed the setting as well.
@@ -168,6 +158,7 @@ class openWBNumber(OpenWBBaseEntity, NumberEntity):
         # self.async_write_ha_state()
 
     def publishToMQTT(self):
+        """Publish data to MQTT."""
         topic = f"{self.entity_description.mqttTopicCommand}"
         _LOGGER.debug("MQTT topic: %s", topic)
         payload = str(int(self._attr_native_value))

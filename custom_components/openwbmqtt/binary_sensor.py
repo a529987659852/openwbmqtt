@@ -1,4 +1,4 @@
-"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT"""
+"""The openwbmqtt component for controlling the openWB wallbox via home assistant / MQTT."""
 from __future__ import annotations
 
 import copy
@@ -8,7 +8,6 @@ from homeassistant.components import mqtt
 from homeassistant.components.binary_sensor import DOMAIN, BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 
@@ -84,9 +83,10 @@ class openwbBinarySensor(OpenWBBaseEntity, BinarySensorEntity):
         nChargePoints: int | None = None,
         currentChargePoint: int | None = None,
     ) -> None:
-        """Initialize the sensor."""
+        """Initialize the sensor.
 
-        """Initialize the sensor and the openWB device."""
+        Initialize the sensor and the openWB device.
+        """
         super().__init__(
             device_friendly_name=device_friendly_name,
             mqtt_root=mqtt_root,
