@@ -33,7 +33,7 @@ The second parameter, **chargepoints**, is the number of configured charge point
 
 # Mosquitto Configuration in an Internal Network
 
-If you're in an internal network, for example your home network, you can simply subscribe the openWB mosquitto server with the mosquitto server you're using with home assistant. No bridge is required. Instead, add the following to the configuration (for example in /etc/mosquitto/conf.d/openwb.conf):
+If you're in an internal network, for example your home network, you can simply subscribe the openWB mosquitto server with the mosquitto server you're using with home assistant. No bridge settings in Home Assistant are required. Instead, add the following to the configuration (for example in /etc/mosquitto/conf.d/openwb.conf):
 
 ```
 #
