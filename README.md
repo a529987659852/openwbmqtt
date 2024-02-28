@@ -1,3 +1,4 @@
+### If you're on openWB2, look here --> https://github.com/a529987659852/openwb2mqtt
 # openwbmqtt
 
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
