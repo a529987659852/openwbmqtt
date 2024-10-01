@@ -1,3 +1,4 @@
+### If you're on openWB2, look here --> https://github.com/a529987659852/openwb2mqtt
 # openwbmqtt
 
 Note: I provide this custom integration without any warranty. It lies in the responsability of each user to validate the functionality with his/her own openWB!
@@ -32,7 +33,7 @@ The second parameter, **chargepoints**, is the number of configured charge point
 
 # Mosquitto Configuration in an Internal Network
 
-If you're in an internal network, for example your home network, you can simply subscribe the openWB mosquitto server with the mosquitto server you're using with home assistant. No bridge is required. Instead, add the following to the configuration (for example in /etc/mosquitto/conf.d/openwb.conf):
+If you're in an internal network, for example your home network, you can simply subscribe the openWB mosquitto server with the mosquitto server you're using with home assistant. No bridge settings in Home Assistant are required. Instead, add the following to the configuration (for example in /etc/mosquitto/conf.d/openwb.conf or /share/mosquitto/mosquitto.conf):
 
 ```
 #
@@ -41,7 +42,21 @@ If you're in an internal network, for example your home network, you can simply 
 connection openwb
 address openwb.fritz.box:1883
 start_type automatic
-topic openWB/# both 2
+topic openWB/# in 2
+topic openWB/set/ChargeMode both 2
+topic openWB/config/set/pv/minCurrentMinPv
+topic openWB/set/lp/1/ChargePointEnabled both 2
+topic openWB/set/lp/2/ChargePointEnabled both 2
+topic openWB/config/set/sofort/lp/1/chargeLimitation both 2
+topic openWB/config/set/sofort/lp/2/chargeLimitation both 2
+topic openWB/config/set/sofort/lp/1/current both 2
+topic openWB/config/set/sofort/lp/2/current both 2
+topic openWB/config/set/sofort/lp/1/energyToCharge both 2
+topic openWB/config/set/sofort/lp/2/energyToCharge both 2
+topic openWB/config/set/sofort/lp/1/socToChargeTo both 2
+topic openWB/config/set/sofort/lp/2/socToChargeTo both 2
+topic openWB/set/lp/1/%Soc both 2
+topic openWB/set/lp/2/%Soc both 2
 local_clientid openwb.mosquitto
 try_private false
 cleansession true
