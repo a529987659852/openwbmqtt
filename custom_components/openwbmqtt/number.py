@@ -40,7 +40,7 @@ async def async_setup_entry(
     for description in NUMBERS_GLOBAL_COPY:
         if description.mqttTopicCommand.startswith("/"):
             description.mqttTopicCommand = f"{mqttRoot}{description.mqttTopicCommand}"
-            description.mqttTopicCurrentValue = f"{mqttRoot}{description.mqttTopicCommand}"
+            description.mqttTopicCurrentValue = f"{mqttRoot}{description.mqttTopicCurrentValue}"
         else:
             description.mqttTopicCommand = f"{mqttRoot}/config/set/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCommand}"
             description.mqttTopicCurrentValue = f"{mqttRoot}/config/get/{str(description.mqttTopicChargeMode)}/{description.mqttTopicCurrentValue}"
