@@ -97,7 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     def fun_change_pricebased_price(call):
         """Change the price for price-based charging"""
-        topic = f"{call.data.get('mqtt_prefix')}/global/awattar/MaxPriceForCharging"
+        topic = f"{call.data.get('mqtt_prefix')}/set/awattar/MaxPriceForCharging"
         _LOGGER.debug("topic (change_pricebased_price): %s", topic)
         _LOGGER.debug(f"set price to: {call.data.get('target_price')}")
         hass.components.mqtt.publish(hass, topic, call.data.get("target_price"))
