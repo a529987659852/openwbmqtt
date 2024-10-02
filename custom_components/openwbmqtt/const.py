@@ -874,7 +874,7 @@ NUMBERS_GLOBAL = [
         native_step=1.0,
         entity_category=EntityCategory.CONFIG,
         # icon=
-        mqttTopicCommand="/global/awattar/MaxPriceForCharging",
+        mqttTopicCommand="/set/awattar/MaxPriceForCharging",
         mqttTopicCurrentValue="/global/awattar/MaxPriceForCharging",
         icon="mdi:currency-eur",
     ),
