@@ -20,6 +20,7 @@ from homeassistant.components.sensor import (
 from homeassistant.components.switch import SwitchDeviceClass, SwitchEntityDescription
 from homeassistant.const import (
     PERCENTAGE,
+    CURRENCY_CENT,
     Platform,
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
@@ -388,6 +389,15 @@ SENSORS_GLOBAL = [
         entity_registry_enabled_default=False,
         icon="mdi:battery-charging-low",
     ),
+    openwbSensorEntityDescription(
+        key="global/awattar/ActualPriceForCharging",
+        name="aktueller Strompreis",
+        device_class=None,
+        native_unit_of_measurement=CURRENCY_CENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        icon="mdi:currency-eur",
+    )
 ]
 
 SENSORS_PER_LP = [
@@ -853,6 +863,20 @@ NUMBERS_GLOBAL = [
         mqttTopicCurrentValue="minCurrentMinPv",
         mqttTopicChargeMode="pv",
         icon="mdi:current-ac",
+    ),
+    openWBNumberEntityDescription(
+        key="global/awattar/MaxPriceForCharging",
+        name="Maximalpreis Laden",
+        device_class=None,
+        native_unit_of_measurement=CURRENCY_CENT,
+        native_min_value=0.0,
+        native_max_value=50.0,
+        native_step=1.0,
+        entity_category=EntityCategory.CONFIG,
+        # icon=
+        mqttTopicCommand="/set/awattar/MaxPriceForCharging",
+        mqttTopicCurrentValue="/global/awattar/MaxPriceForCharging",
+        icon="mdi:currency-eur",
     ),
 ]
 

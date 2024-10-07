@@ -137,6 +137,7 @@ change_charge_current_per_cp:
           min: 6
           max: 16
           step: 1  
+
 enable_disable_price_based_charging:
   description: Enable or disable price-based charging
   fields:
@@ -167,3 +168,25 @@ enable_disable_price_based_charging:
         number:
           min: 1
           max: 8
+
+change_pricebased_price:
+  description: Change Price for price-based charging
+  fields:
+    mqtt_prefix:
+      name: Prefix for MQTT topic
+      description: respective Prefix on the MQTT server that addresses the respective wallbox
+      default: 'openWB/openWB'
+      example: 'openWB/openWB'
+      required: true
+      selector:
+        text:
+    target_price:
+      name: Charging price in cent
+      description: Price in cent
+      default: 20
+      example: 22
+      selector:
+        number:
+          min: 0
+          max: 50
+          step: 1
